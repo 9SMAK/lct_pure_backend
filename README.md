@@ -1,1 +1,1 @@
-# vtb-hackathon-pure
+# lct_hackathone_pure
