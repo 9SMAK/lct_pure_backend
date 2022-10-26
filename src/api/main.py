@@ -21,13 +21,7 @@ app.add_middleware(
 )
 
 api_router = APIRouter(prefix="/api")
-api_router.include_router(user_router.router)
+# api_router.include_router(user_router.router)
 api_router.include_router(admin_router.router)
 api_router.include_router(auth_router.router)
 app.include_router(api_router)
-
-
-@app.get("/homepage/{username}")
-async def homepage(username: str):
-    print(os.getenv("POSTGRES_URL"), os.getenv("POSTGRES_DB"))
-    return HomePageResponse(username=username, message=f"Hello, {username}, {os.getenv('POSTGRES_DB')}")
