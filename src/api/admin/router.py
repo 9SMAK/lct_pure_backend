@@ -29,9 +29,3 @@ async def get_all_users():
 async def get_user_by_id(user_id: int) -> User:
     result = await USER.get_by_id(id=user_id)
     return result
-
-
-@router.post("/add_user")
-async def add_user(name: str, password: str):
-    res = await USER.add(name=name, password=password)
-    return res

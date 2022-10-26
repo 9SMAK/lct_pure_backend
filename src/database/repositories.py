@@ -73,9 +73,9 @@ class UserRepository(Repository):
     _table = User
     _pydantic_schema = schemas.User
 
-    async def get_by_login(self, name: str) -> _pydantic_schema:
+    async def get_by_login(self, login: str) -> _pydantic_schema:
         async with self._sessionmaker() as session:
-            statement = select(self._table).filter(self._table.name == name)
+            statement = select(self._table).filter(self._table.login == login)
             res = (await session.execute(statement)).first()
             return self._pydantic_convert_object(res)
 

@@ -9,8 +9,8 @@ class User(Base):
     __tablename__ = "user"
 
     id = Column(Integer, autoincrement=True, primary_key=True, index=True)
-    name = Column(String, nullable=False, unique=True)
-    password = Column(String, nullable=False)
+    login = Column(String, nullable=False, unique=True)
+    hashed_password = Column(String, nullable=False)
 
     def __repr__(self):
         return f"<User(id={self.id}, " \

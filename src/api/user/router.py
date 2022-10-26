@@ -3,12 +3,12 @@ from src.api.user.schemas import UserAuthData
 from src.database.repositories import USER
 from src.database.schemas import User
 
-router = APIRouter(prefix="/user", tags=["Admin"])
+router = APIRouter(prefix="/user", tags=["User"])
 
 
 @router.post("/create")
-async def add_user(login: str, password: str, name: str):
-    res = await USER.add(login=login, hashed_password=password, name=name)
+async def add_user(login: str, password: str):
+    res = await USER.add(login=login, hashed_password=password)
     return res
 
 
