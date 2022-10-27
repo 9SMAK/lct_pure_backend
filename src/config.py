@@ -1,3 +1,4 @@
+import enum
 import os
 from pathlib import Path
 
@@ -17,3 +18,10 @@ ALGORITHM = os.getenv("ALGORITHM")
 ACCESS_TOKEN_EXPIRE_MINUTES = float(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES"))
 
 FILES_PATH = "src/files/"
+
+
+class UserIdeaStatus():
+    dislike = 0
+    like = 1
+    member = 2
+    request_membership = 3

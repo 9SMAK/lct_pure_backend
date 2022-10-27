@@ -27,8 +27,18 @@ class Idea(Base):
     project_directory_id = Column(String, nullable=False)
     photo_id = Column(String, nullable=False)
     video_id = Column(String)
+    approved = Column(Boolean)
 
     def __repr__(self):
         return f"<Idea(id={self.id}, " \
                f"author=\"{self.name}\"" \
                f"name=\"{self.name}\")>"
+
+
+class UserIdeaRelations(Base):
+    __tablename__ = "user_idea_relations"
+
+    id = Column(Integer, autoincrement=True, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("user.id"), nullable=False)
+    idea_id = Column(Integer, ForeignKey("idea.id"), nullable=False)
+    relation = Column(Integer, nullable=False)

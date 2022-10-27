@@ -4,7 +4,7 @@ from typing import List, Dict
 from pydantic import BaseModel
 
 
-class IdeaInfoRequest(BaseModel):
+class CreateIdeaRequest(BaseModel):
     title: str
     description: str
 
@@ -19,6 +19,5 @@ class IdeaInfoRequest(BaseModel):
         return value
 
 
-class IdeaInfoResponse(BaseModel):
-    success: bool
-    project_directory_id: str
+class IdeaIdRequest(BaseModel):
+    id: int

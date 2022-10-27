@@ -12,7 +12,7 @@ import src.database.schemas as schemas
 from .database import DATABASE
 from sqlalchemy.ext.asyncio import AsyncEngine
 
-from src.database.tables import User
+from src.database.tables import User, UserIdeaRelations
 from src.database.tables import Idea
 
 logger = logging.getLogger(__name__)
@@ -90,3 +90,11 @@ class IdeaRepository(Repository):
 
 
 IDEA = IdeaRepository(DATABASE.get_engine(), DATABASE.get_sessionmaker())
+
+
+class UserIdeaRelationsRepository(Repository):
+    _table = UserIdeaRelations
+    _pydantic_schema = schemas.UserIdeaRelations
+
+
+USERIDEARELATIONS = UserIdeaRelationsRepository(DATABASE.get_engine(), DATABASE.get_sessionmaker())
