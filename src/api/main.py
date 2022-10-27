@@ -6,6 +6,8 @@ import src.config as cfg
 from src.api.user import router as user_router
 from src.api.auth import router as auth_router
 from src.api.admin import router as admin_router
+from src.api.idea import router as idea_router
+
 from src.api.schemas import HomePageResponse, ResponseStatus, SqlReturn
 from fastapi.middleware.cors import CORSMiddleware
 from src.api.auth.authentication import authenticate_user, create_access_token, get_current_user, get_password_hash, \
@@ -22,6 +24,7 @@ app.add_middleware(
 
 api_router = APIRouter(prefix="/api")
 # api_router.include_router(user_router.router)
+api_router.include_router(idea_router.router)
 api_router.include_router(admin_router.router)
 api_router.include_router(auth_router.router)
 app.include_router(api_router)

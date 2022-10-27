@@ -22,3 +22,5 @@ services:
       SECRET_KEY: $SECRET_KEY
       ALGORITHM: $ALGORITHM
       ACCESS_TOKEN_EXPIRE_MINUTES: $ACCESS_TOKEN_EXPIRE_MINUTES
+    volumes:
+    - ./files:/server/src/files

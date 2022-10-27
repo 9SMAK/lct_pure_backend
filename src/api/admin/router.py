@@ -1,7 +1,7 @@
 from fastapi import APIRouter
 
 from src.api.schemas import OkResponse
-from src.database.repositories import USER
+from src.database.repositories import USER, IDEA
 from src.database.schemas import User
 
 router = APIRouter(prefix="/admin", tags=["Admin"])
@@ -28,4 +28,22 @@ async def get_all_users():
 @router.get("/get_user_by_id")
 async def get_user_by_id(user_id: int) -> User:
     result = await USER.get_by_id(id=user_id)
+    return result
+
+
+@router.get("/create_ideas")
+async def create_ideas():
+    await IDEA.create_repository()
+    return OkResponse()
+
+
+@router.get("/drop_ideas")
+async def drop_ideas():
+    await IDEA.delete_repository()
+    return OkResponse()
+
+
+@router.get("/get_all_ideas")
+async def get_all_ideas():
+    result = await IDEA.get_all()
     return result

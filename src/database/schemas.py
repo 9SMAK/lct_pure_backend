@@ -8,3 +8,16 @@ class User(BaseModel):
 
     class Config:
         orm_mode = True
+
+
+class Idea(BaseModel):
+    id: int
+    title: str
+    description: str
+    author: int
+    project_directory_id: str
+    photo_id: str
+    video_id: str = None
+
+    class Config:
+        orm_mode = True

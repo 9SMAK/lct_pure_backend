@@ -15,3 +15,5 @@ PRIVATE_KEY = os.getenv("PRIVATE_KEY")
 SECRET_KEY = os.getenv("SECRET_KEY")
 ALGORITHM = os.getenv("ALGORITHM")
 ACCESS_TOKEN_EXPIRE_MINUTES = float(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES"))
+
+FILES_PATH = "src/files/"
