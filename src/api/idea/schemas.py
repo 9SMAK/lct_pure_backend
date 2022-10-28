@@ -34,7 +34,7 @@ class EditIdeaRequest(BaseModel):
         return value
 
 
-class Comment(BaseModel):
+class CommentRequest(BaseModel):
     idea_id: int
     reply_comment_id: int = None
     text: str

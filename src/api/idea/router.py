@@ -1,4 +1,5 @@
 import uuid
+from typing import List
 
 from fastapi import APIRouter, Depends, UploadFile, Body, File, HTTPException, status
 from starlette.responses import StreamingResponse, FileResponse
@@ -8,7 +9,8 @@ from src.api.schemas import OkResponse
 from src.api.utils import create_dir, async_upload_file, read_from_file, remove_file
 from src.database.repositories import IDEA, USERIDEARELATIONS, COMMENT
 from src.api.auth.authentication import AuthenticatedUser, get_current_user
-from src.api.idea.schemas import CreateIdeaRequest, EditIdeaRequest, Comment
+from src.api.idea.schemas import CreateIdeaRequest, EditIdeaRequest, CommentRequest
+from src.database.schemas import Idea, Comment
 
 router = APIRouter(prefix="/idea", tags=["Idea"])
 
@@ -22,7 +24,7 @@ async def create_idea(*,
                       info: CreateIdeaRequest = Body(...)) -> OkResponse:
     project_directory_id = str(uuid.uuid4())
     photo_id = str(uuid.uuid4())
-    video_id = str(uuid.uuid4())
+    video_id = str(uuid.uuid4()) if video else None
 
     idea = await IDEA.add(
         title=info.title,
@@ -80,10 +82,18 @@ async def edit_idea(*,
                                 ext='.jpg')
 
     if video:
-        await remove_file(idea.project_directory_id, f'{idea.video_id}.mp4')
+        if idea.video_id:
+            await remove_file(idea.project_directory_id, f'{idea.video_id}.mp4')
+
+        video_id = str(uuid.uuid4()) if not idea.video_id else idea.video_id
+
+        if not idea.video_id:
+            video_id_info = {"video_id": video_id}
+            await IDEA.edit_idea(idea_id, **video_id_info)
+
         await async_upload_file(file=video,
                                 project_directory_id=idea.project_directory_id,
-                                file_id=idea.video_id,
+                                file_id=video_id,
                                 ext='.mp4')
 
     res = await IDEA.edit_idea(idea_id, **info.dict(exclude_none=True))
@@ -189,7 +199,7 @@ async def request_membership(*,
 @router.post("/comment")
 async def comment_idea(*,
                        current_user: AuthenticatedUser = Depends(get_current_user),
-                       comment: Comment) -> OkResponse:
+                       comment: CommentRequest) -> OkResponse:
     await IDEA.safe_increase_comments(idea_id=comment.idea_id)
     res = await COMMENT.add(
         idea_id=comment.idea_id,
@@ -208,39 +218,39 @@ async def comment_idea(*,
 
 
 @router.get("/get_comments_by_id")
-async def get_comments_by_id(idea_id: int):
+async def get_comments_by_id(idea_id: int) -> Comment:
     result = await COMMENT.get_comments_by_id(idea_id=idea_id)
     return result
 
 
 @router.get("/get_all_ideas")
-async def get_all_ideas():
+async def get_all_ideas() -> List[Idea]:
     result = await IDEA.get_all()
     return result
 
 
 @router.get("/get_approved_ideas")
-async def get_approved_ideas():
+async def get_approved_ideas() -> List[Idea]:
     result = await IDEA.get_approved()
     return result
 
 
 @router.get("/get_my_ideas")
 async def get_idea_by_id(*,
-                         current_user: AuthenticatedUser = Depends(get_current_user)):
+                         current_user: AuthenticatedUser = Depends(get_current_user)) -> List[Idea]:
     result = await IDEA.get_my_ideas(current_user.id)
     return result
 
 
 @router.get("/get_idea_by_id")
-async def get_idea_by_id(idea_id: int):
+async def get_idea_by_id(idea_id: int) -> Idea:
     result = await IDEA.get_by_id(idea_id)
     return result
 
 
 @router.get("/get_unwatched_ideas")
 async def get_unwatched_ideas(*,
-                              current_user: AuthenticatedUser = Depends(get_current_user)):
+                              current_user: AuthenticatedUser = Depends(get_current_user)) -> List[Idea]:
     all_ideas = await IDEA.get_approved()
     all_relations = await USERIDEARELATIONS.get_all_by_user_id(user_id=current_user.id)
     all_relations_ids = [relation.idea_id for relation in all_relations]
@@ -250,7 +260,7 @@ async def get_unwatched_ideas(*,
 
 
 @router.get("/video_stream")
-async def video_stream_endpoint(idea_id: int):
+async def video_stream_endpoint(idea_id: int) -> StreamingResponse:
     idea_info = await IDEA.get_by_id(idea_id)
     try:
         file_contents = read_from_file(project_directory_id=idea_info.project_directory_id,
@@ -267,7 +277,7 @@ async def video_stream_endpoint(idea_id: int):
 
 
 @router.get("/video")
-async def video_endpoint(idea_id: int):
+async def video_endpoint(idea_id: int) -> FileResponse:
     idea_info = await IDEA.get_by_id(idea_id)
 
     if not idea_info:
@@ -277,7 +287,7 @@ async def video_endpoint(idea_id: int):
 
 
 @router.get("/photo")
-async def photo_endpoint(idea_id: int):
+async def photo_endpoint(idea_id: int) -> FileResponse:
     idea_info = await IDEA.get_by_id(idea_id)
 
     if not idea_info:
