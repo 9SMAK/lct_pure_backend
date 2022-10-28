@@ -1,23 +1,16 @@
 import uuid
-import aiofiles
-from fastapi import Request, Response
-from fastapi import Header
 
-
-from fastapi import APIRouter, Depends, UploadFile, Body, File, HTTPException, status, Path
+from fastapi import APIRouter, Depends, UploadFile, Body, File, HTTPException, status
 from starlette.responses import StreamingResponse, FileResponse
-from starlette.templating import Jinja2Templates
 
 from src.config import UserIdeaRelations, FILES_PATH
 from src.api.schemas import OkResponse
 from src.api.utils import create_dir, async_upload_file, read_from_file
-from src.database.repositories import IDEA, USERIDEARELATIONS
+from src.database.repositories import IDEA, USERIDEARELATIONS, COMMENT
 from src.api.auth.authentication import AuthenticatedUser, get_current_user
-from src.api.idea.schemas import CreateIdeaRequest, IdeaIdRequest
+from src.api.idea.schemas import CreateIdeaRequest, Comment
 
 router = APIRouter(prefix="/idea", tags=["Idea"])
-templates = Jinja2Templates(directory="templates")
-CHUNK_SIZE = 1024 * 1024
 
 
 @router.post("/create")
@@ -34,7 +27,8 @@ async def create_idea(*,
         title=info.title,
         description=info.description,
         author=current_user.id,
-        likes=0,
+        likes_count=0,
+        comments_count=0,
         project_directory_id=project_directory_id,
         photo_id=photo_id,
         video_id=video_id,
@@ -121,9 +115,42 @@ async def dislike_idea(*,
     return OkResponse()
 
 
+@router.post("/comment")
+async def comment_idea(*,
+                       current_user: AuthenticatedUser = Depends(get_current_user),
+                       comment: Comment) -> OkResponse:
+    await IDEA.safe_increase_comments(idea_id=comment.idea_id)
+    res = await COMMENT.add(
+        idea_id=comment.idea_id,
+        user_id=current_user.id,
+        reply_comment_id=comment.reply_comment_id,
+        text=comment.text
+    )
+
+    if not res:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Error while modifying base",
+        )
+
+    return OkResponse()
+
+
+@router.get("/get_comments_by_id")
+async def get_comments_by_id(idea_id: int):
+    result = await COMMENT.get_comments_by_id(idea_id=idea_id)
+    return result
+
+
 @router.get("/get_all_ideas")
 async def get_all_ideas():
     result = await IDEA.get_all()
+    return result
+
+
+@router.get("/get_approved_ideas")
+async def get_approved_ideas():
+    result = await IDEA.get_approved()
     return result
 
 

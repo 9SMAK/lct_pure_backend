@@ -7,6 +7,7 @@ class User(BaseModel):
     id: int
     login: str
     hashed_password: str
+    is_admin: bool
     first_name: str = None
     last_name: str = None
     birth: datetime.date = None
@@ -24,7 +25,8 @@ class Idea(BaseModel):
     title: str
     description: str
     author: int
-    likes: int
+    likes_count: int
+    comments_count: int
     project_directory_id: str
     photo_id: str
     video_id: str = None
@@ -39,6 +41,17 @@ class UserIdeaRelations(BaseModel):
     user_id: int
     idea_id: int
     relation: int
+
+    class Config:
+        orm_mode = True
+
+
+class Comment(BaseModel):
+    id: int
+    user_id: int
+    idea_id: int
+    reply_comment_id: int = None
+    text: str
 
     class Config:
         orm_mode = True

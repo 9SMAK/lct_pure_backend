@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from src.database.repositories import USER, IDEA, USERIDEARELATIONS
+from src.database.repositories import USER, IDEA, USERIDEARELATIONS, COMMENT
 from src.database.schemas import User
 from src.api.schemas import OkResponse
 
@@ -11,12 +11,14 @@ async def create_all():
     await USER.create_repository()
     await IDEA.create_repository()
     await USERIDEARELATIONS.create_repository()
+    await COMMENT.create_repository()
     return OkResponse()
 
 
 @router.get("/drop_all")
 async def drop_all():
     await USERIDEARELATIONS.delete_repository()
+    await COMMENT.delete_repository()
     await IDEA.delete_repository()
     await USER.delete_repository()
     return OkResponse()

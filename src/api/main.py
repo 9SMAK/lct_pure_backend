@@ -1,7 +1,4 @@
-import os
-
-from fastapi import FastAPI, APIRouter, Depends
-import src.config as cfg
+from fastapi import FastAPI, APIRouter
 
 from src.api.user import router as user_router
 from src.api.auth import router as auth_router
@@ -9,10 +6,9 @@ from src.api.admin import router as admin_router
 from src.api.idea import router as idea_router
 from src.api.database import router as database_router
 
-from src.api.schemas import HomePageResponse, ResponseStatus, SqlReturn
+from src.database.repositories import USER, IDEA, USERIDEARELATIONS, COMMENT
 from fastapi.middleware.cors import CORSMiddleware
-from src.api.auth.authentication import authenticate_user, create_access_token, get_current_user, get_password_hash, \
-    AuthenticatedUser
+
 
 app = FastAPI()
 app.add_middleware(
@@ -24,7 +20,6 @@ app.add_middleware(
 )
 
 api_router = APIRouter(prefix="/api")
-# api_router.include_router(user_router.router)
 api_router.include_router(idea_router.router)
 api_router.include_router(user_router.router)
 api_router.include_router(admin_router.router)

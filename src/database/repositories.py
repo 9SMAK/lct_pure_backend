@@ -5,15 +5,13 @@ from pydantic import BaseModel
 from sqlalchemy import select, delete, update
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import Session, declarative_base
 from sqlalchemy.sql.ddl import DropTable, CreateTable
 
 import src.database.schemas as schemas
 from .database import DATABASE
 from sqlalchemy.ext.asyncio import AsyncEngine
 
-from src.database.tables import User, UserIdeaRelations
-from src.database.tables import Idea
+from src.database.tables import User, UserIdeaRelations, Comment, Idea
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
@@ -106,10 +104,22 @@ class IdeaRepository(Repository):
     _table = Idea
     _pydantic_schema = schemas.Idea
 
+    async def get_approved(self):
+        async with self._sessionmaker() as session:
+            statement = select(self._table).filter(self._table.approved == True)
+            res = (await session.execute(statement))
+            return self._pydantic_convert_list(res)
+
     async def safe_increase_like(self, idea_id: int):
         statement = update(self._table).where(
             self._table.id == idea_id
-        ).values(likes=self._table.likes + 1)
+        ).values(likes_count=self._table.likes_count + 1)
+        await self.update_values(statement)
+
+    async def safe_increase_comments(self, idea_id: int):
+        statement = update(self._table).where(
+            self._table.id == idea_id
+        ).values(comments_count=self._table.comments_count + 1)
         await self.update_values(statement)
 
     async def approve_idea(self, idea_id: int):
@@ -134,3 +144,17 @@ class UserIdeaRelationsRepository(Repository):
 
 
 USERIDEARELATIONS = UserIdeaRelationsRepository(DATABASE.get_engine(), DATABASE.get_sessionmaker())
+
+
+class CommentRepository(Repository):
+    _table = Comment
+    _pydantic_schema = schemas.Comment
+
+    async def get_comments_by_id(self, idea_id):
+        async with self._sessionmaker() as session:
+            statement = select(self._table).filter(self._table.idea_id == idea_id)
+            res = (await session.execute(statement))
+            return self._pydantic_convert_list(res)
+
+
+COMMENT = CommentRepository(DATABASE.get_engine(), DATABASE.get_sessionmaker())

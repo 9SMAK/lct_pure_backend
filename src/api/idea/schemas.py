@@ -19,5 +19,7 @@ class CreateIdeaRequest(BaseModel):
         return value
 
 
-class IdeaIdRequest(BaseModel):
-    id: int
+class Comment(BaseModel):
+    idea_id: int
+    reply_comment_id: int = None
+    text: str

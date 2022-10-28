@@ -11,6 +11,7 @@ class User(Base):
     id = Column(Integer, autoincrement=True, primary_key=True, index=True)
     login = Column(String, nullable=False, unique=True)
     hashed_password = Column(String, nullable=False)
+    is_admin = Column(Boolean, default=False)
     first_name = Column(String)
     last_name = Column(String)
     birth = Column(Date)
@@ -31,7 +32,8 @@ class Idea(Base):
     author = Column(Integer, ForeignKey("user.id"), nullable=False)
     title = Column(String, nullable=False, unique=True)
     description = Column(String)
-    likes = Column(Integer)
+    likes_count = Column(Integer)
+    comments_count = Column(Integer)
     project_directory_id = Column(String, nullable=False)
     photo_id = Column(String, nullable=False)
     video_id = Column(String)
@@ -50,3 +52,13 @@ class UserIdeaRelations(Base):
     user_id = Column(Integer, ForeignKey("user.id"), nullable=False)
     idea_id = Column(Integer, ForeignKey("idea.id"), nullable=False)
     relation = Column(Integer, nullable=False)
+
+
+class Comment(Base):
+    __tablename__ = "comment"
+
+    id = Column(Integer, autoincrement=True, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("user.id"), nullable=False)
+    idea_id = Column(Integer, ForeignKey("idea.id"), nullable=False)
+    reply_comment_id = Column(Integer)
+    text = Column(String, nullable=False)
