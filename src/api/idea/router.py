@@ -12,6 +12,7 @@ from src.api.idea.schemas import CreateIdeaRequest, EditIdeaRequest, Comment
 
 router = APIRouter(prefix="/idea", tags=["Idea"])
 
+
 # TODO: add author to members
 @router.post("/create")
 async def create_idea(*,
@@ -155,6 +156,36 @@ async def dislike_idea(*,
     return OkResponse()
 
 
+@router.post("/request_membership")
+async def request_membership(*,
+                             current_user: AuthenticatedUser = Depends(get_current_user),
+                             idea_id: int) -> OkResponse:
+    request_exist = await USERIDEARELATIONS.get_relation_by_user_id(user_id=current_user.id,
+                                                                    relation=UserIdeaRelations.request_membership)
+    member_exist = await USERIDEARELATIONS.get_relation_by_user_id(user_id=current_user.id,
+                                                                   relation=UserIdeaRelations.member)
+
+    if request_exist or member_exist:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="You already in team or sent request",
+        )
+
+    relation = await USERIDEARELATIONS.add(
+        user_id=current_user.id,
+        idea_id=idea_id,
+        relation=UserIdeaRelations.request_membership
+    )
+
+    if not relation:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Error while modifying base",
+        )
+
+    return OkResponse()
+
+
 @router.post("/comment")
 async def comment_idea(*,
                        current_user: AuthenticatedUser = Depends(get_current_user),
@@ -194,6 +225,13 @@ async def get_approved_ideas():
     return result
 
 
+@router.get("/get_my_ideas")
+async def get_idea_by_id(*,
+                         current_user: AuthenticatedUser = Depends(get_current_user)):
+    result = await IDEA.get_my_ideas(current_user.id)
+    return result
+
+
 @router.get("/get_idea_by_id")
 async def get_idea_by_id(idea_id: int):
     result = await IDEA.get_by_id(idea_id)
@@ -211,8 +249,8 @@ async def get_unwatched_ideas(*,
     return result
 
 
-@router.get("/video")
-async def video_endpoint(idea_id: int):
+@router.get("/video_stream")
+async def video_stream_endpoint(idea_id: int):
     idea_info = await IDEA.get_by_id(idea_id)
     try:
         file_contents = read_from_file(project_directory_id=idea_info.project_directory_id,
@@ -226,6 +264,16 @@ async def video_endpoint(idea_id: int):
         return response
     except FileNotFoundError:
         raise HTTPException(detail="File not found.", status_code=status.HTTP_404_NOT_FOUND)
+
+
+@router.get("/video")
+async def video_endpoint(idea_id: int):
+    idea_info = await IDEA.get_by_id(idea_id)
+
+    if not idea_info:
+        raise HTTPException(detail="Idea not found.", status_code=status.HTTP_404_NOT_FOUND)
+
+    return FileResponse(f'{FILES_PATH}{idea_info.project_directory_id}/{idea_info.video_id}.mp4')
 
 
 @router.get("/photo")

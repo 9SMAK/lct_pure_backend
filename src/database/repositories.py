@@ -110,6 +110,12 @@ class IdeaRepository(Repository):
             res = (await session.execute(statement))
             return self._pydantic_convert_list(res)
 
+    async def get_my_ideas(self, user_id):
+        async with self._sessionmaker() as session:
+            statement = select(self._table).filter(self._table.author == user_id)
+            res = (await session.execute(statement))
+            return self._pydantic_convert_list(res)
+
     async def safe_increase_like(self, idea_id: int):
         statement = update(self._table).where(
             self._table.id == idea_id
