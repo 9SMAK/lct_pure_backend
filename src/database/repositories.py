@@ -128,6 +128,13 @@ class IdeaRepository(Repository):
         ).values(approved=True)
         await self.update_values(statement)
 
+    async def edit_idea(self, idea_id, **kwargs):
+        statement = update(self._table).where(
+            self._table.id == idea_id
+        ).values(kwargs)
+        await self.update_values(statement)
+        return True
+
 
 IDEA = IdeaRepository(DATABASE.get_engine(), DATABASE.get_sessionmaker())
 
@@ -136,9 +143,15 @@ class UserIdeaRelationsRepository(Repository):
     _table = UserIdeaRelations
     _pydantic_schema = schemas.UserIdeaRelations
 
-    async def get_by_user_id(self, user_id: str, relation: int) -> _pydantic_schema:
+    async def get_relation_by_user_id(self, user_id: str, relation: int) -> _pydantic_schema:
         async with self._sessionmaker() as session:
             statement = select(self._table).filter(self._table.user_id == user_id, self._table.relation == relation)
+            res = (await session.execute(statement))
+            return self._pydantic_convert_list(res)
+
+    async def get_all_by_user_id(self, user_id: str) -> _pydantic_schema:
+        async with self._sessionmaker() as session:
+            statement = select(self._table).filter(self._table.user_id == user_id)
             res = (await session.execute(statement))
             return self._pydantic_convert_list(res)
 
