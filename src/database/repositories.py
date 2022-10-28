@@ -63,6 +63,17 @@ class Repository:
                 await session.rollback()
                 return False
 
+    async def update_values(self, statement):
+        async with self._sessionmaker() as session:
+            try:
+                await session.execute(statement)
+                await session.commit()
+                await session.flush()
+            except IntegrityError:
+                await session.rollback()
+                return False
+        return True
+
     def _pydantic_convert_object(self, sqlalchemy_object):
         return self._pydantic_schema.from_orm(sqlalchemy_object[0])
 
@@ -89,18 +100,16 @@ class IdeaRepository(Repository):
     _pydantic_schema = schemas.Idea
 
     async def safe_increase_like(self, idea_id: int):
-        async with self._sessionmaker() as session:
-            try:
-                statement = update(self._table).where(
-                    self._table.id == idea_id
-                ).values(likes=self._table.likes + 1)
-                await session.execute(statement)
-                await session.commit()
-                await session.flush()
-                return True
-            except IntegrityError:
-                await session.rollback()
-                return False
+        statement = update(self._table).where(
+            self._table.id == idea_id
+        ).values(likes=self._table.likes + 1)
+        await self.update_values(statement)
+
+    async def approve_idea(self, idea_id: int):
+        statement = update(self._table).where(
+            self._table.id == idea_id
+        ).values(approved=True)
+        await self.update_values(statement)
 
 
 IDEA = IdeaRepository(DATABASE.get_engine(), DATABASE.get_sessionmaker())

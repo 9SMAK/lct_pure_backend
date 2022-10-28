@@ -65,7 +65,7 @@ async def create_idea(*,
 @router.post("/like")
 async def like_idea(*,
                     current_user: AuthenticatedUser = Depends(get_current_user),
-                    info: IdeaIdRequest) -> OkResponse:
+                    idea_id: int) -> OkResponse:
     like_exist = await USERIDEARELATIONS.get_by_user_id(user_id=current_user.id,
                                                         relation=UserIdeaRelations.like)
 
@@ -77,12 +77,12 @@ async def like_idea(*,
 
     relation = await USERIDEARELATIONS.add(
         user_id=current_user.id,
-        idea_id=info.id,
+        idea_id=idea_id,
         relation=UserIdeaRelations.like
     )
 
     await IDEA.safe_increase_like(
-        idea_id=info.id
+        idea_id=idea_id
     )
 
     if not relation:
@@ -97,7 +97,7 @@ async def like_idea(*,
 @router.post("/dislike")
 async def dislike_idea(*,
                        current_user: AuthenticatedUser = Depends(get_current_user),
-                       info: IdeaIdRequest) -> OkResponse:
+                       idea_id: int) -> OkResponse:
     dislike_exist = await USERIDEARELATIONS.get_by_user_id(user_id=current_user.id,
                                                            relation=UserIdeaRelations.dislike)
     if dislike_exist:
@@ -108,7 +108,7 @@ async def dislike_idea(*,
 
     relation = await USERIDEARELATIONS.add(
         user_id=current_user.id,
-        idea_id=info.id,
+        idea_id=idea_id,
         relation=UserIdeaRelations.dislike
     )
 
