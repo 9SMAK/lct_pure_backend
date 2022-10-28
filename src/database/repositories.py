@@ -88,6 +88,20 @@ class IdeaRepository(Repository):
     _table = Idea
     _pydantic_schema = schemas.Idea
 
+    async def safe_increase_like(self, idea_id: int):
+        async with self._sessionmaker() as session:
+            try:
+                statement = update(self._table).where(
+                    self._table.id == idea_id
+                ).values(likes=self._table.likes + 1)
+                await session.execute(statement)
+                await session.commit()
+                await session.flush()
+                return True
+            except IntegrityError:
+                await session.rollback()
+                return False
+
 
 IDEA = IdeaRepository(DATABASE.get_engine(), DATABASE.get_sessionmaker())
 
@@ -95,6 +109,12 @@ IDEA = IdeaRepository(DATABASE.get_engine(), DATABASE.get_sessionmaker())
 class UserIdeaRelationsRepository(Repository):
     _table = UserIdeaRelations
     _pydantic_schema = schemas.UserIdeaRelations
+
+    async def get_by_user_id(self, user_id: str, relation: int) -> _pydantic_schema:
+        async with self._sessionmaker() as session:
+            statement = select(self._table).filter(self._table.user_id == user_id, self._table.relation == relation)
+            res = (await session.execute(statement))
+            return self._pydantic_convert_list(res)
 
 
 USERIDEARELATIONS = UserIdeaRelationsRepository(DATABASE.get_engine(), DATABASE.get_sessionmaker())

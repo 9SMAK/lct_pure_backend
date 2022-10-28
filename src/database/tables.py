@@ -24,6 +24,7 @@ class Idea(Base):
     author = Column(Integer, ForeignKey("user.id"), nullable=False)
     title = Column(String, nullable=False, unique=True)
     description = Column(String)
+    likes = Column(Integer)
     project_directory_id = Column(String, nullable=False)
     photo_id = Column(String, nullable=False)
     video_id = Column(String)

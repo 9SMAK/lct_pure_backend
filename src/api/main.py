@@ -26,6 +26,7 @@ app.add_middleware(
 api_router = APIRouter(prefix="/api")
 # api_router.include_router(user_router.router)
 api_router.include_router(idea_router.router)
+api_router.include_router(user_router.router)
 api_router.include_router(admin_router.router)
 api_router.include_router(auth_router.router)
 api_router.include_router(database_router.router)

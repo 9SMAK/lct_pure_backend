@@ -15,6 +15,7 @@ class Idea(BaseModel):
     title: str
     description: str
     author: int
+    likes: int
     project_directory_id: str
     photo_id: str
     video_id: str = None

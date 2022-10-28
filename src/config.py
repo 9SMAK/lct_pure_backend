@@ -20,7 +20,7 @@ ACCESS_TOKEN_EXPIRE_MINUTES = float(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES"))
 FILES_PATH = "src/files/"
 
 
-class UserIdeaStatus():
+class UserIdeaRelations():
     dislike = 0
     like = 1
     member = 2

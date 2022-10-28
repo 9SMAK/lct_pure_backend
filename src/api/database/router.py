@@ -16,9 +16,9 @@ async def create_all():
 
 @router.get("/drop_all")
 async def drop_all():
-    await USER.create_repository()
-    await IDEA.delete_repository()
     await USERIDEARELATIONS.delete_repository()
+    await IDEA.delete_repository()
+    await USER.delete_repository()
     return OkResponse()
 
 
@@ -56,9 +56,3 @@ async def create_ideas():
 async def drop_ideas():
     await IDEA.delete_repository()
     return OkResponse()
-
-
-@router.get("/get_all_ideas")
-async def get_all_ideas():
-    result = await IDEA.get_all()
-    return result
