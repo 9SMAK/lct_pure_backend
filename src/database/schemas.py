@@ -1,3 +1,5 @@
+import datetime
+
 from pydantic import BaseModel
 
 
@@ -5,6 +7,13 @@ class User(BaseModel):
     id: int
     login: str
     hashed_password: str
+    first_name: str = None
+    last_name: str = None
+    birth: datetime.date = None
+    email: str = None
+    phone: str = None
+    telegram: str = None
+    github: str = None
 
     class Config:
         orm_mode = True

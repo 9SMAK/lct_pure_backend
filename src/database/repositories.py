@@ -91,6 +91,13 @@ class UserRepository(Repository):
             res = (await session.execute(statement)).first()
             return self._pydantic_convert_object(res)
 
+    async def edit_profile(self, user_id, **kwargs):
+        statement = update(self._table).where(
+            self._table.id == user_id
+        ).values(kwargs)
+        await self.update_values(statement)
+        return True
+
 
 USER = UserRepository(DATABASE.get_engine(), DATABASE.get_sessionmaker())
 

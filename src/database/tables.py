@@ -1,4 +1,4 @@
-from sqlalchemy import Boolean, Column, Integer, String, Float, CheckConstraint, PickleType, ForeignKey
+from sqlalchemy import Boolean, Column, Integer, String, Date, ForeignKey
 from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.orm import Session, declarative_base
 
@@ -11,6 +11,13 @@ class User(Base):
     id = Column(Integer, autoincrement=True, primary_key=True, index=True)
     login = Column(String, nullable=False, unique=True)
     hashed_password = Column(String, nullable=False)
+    first_name = Column(String)
+    last_name = Column(String)
+    birth = Column(Date)
+    email = Column(String)
+    phone = Column(String)
+    telegram = Column(String)
+    github = Column(String)
 
     def __repr__(self):
         return f"<User(id={self.id}, " \
