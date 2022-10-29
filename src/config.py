@@ -1,4 +1,3 @@
-import enum
 import os
 from pathlib import Path
 
@@ -11,7 +10,6 @@ POSTGRES_URL = os.getenv("POSTGRES_URL")
 
 IPFS_URL = os.getenv("IPFS_URL")
 
-PUBLIC_ADMIN_KEY = '0xdEE1415af0534B5EDa0995b8682BDB8a3d9498E5'
 PRIVATE_KEY = os.getenv("PRIVATE_KEY")
 SECRET_KEY = os.getenv("SECRET_KEY")
 ALGORITHM = os.getenv("ALGORITHM")
