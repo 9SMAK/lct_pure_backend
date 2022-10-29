@@ -111,7 +111,7 @@ async def request_membership(*,
     return OkResponse()
 
 
-@router.get("/get_unwatched_ideas")
+@router.get("/get_unwatched_idea")
 async def get_unwatched_ideas(*,
                               telegram_username: str) -> List[Idea]:
     user = await USER.get_by_telegram(telegram=telegram_username)
@@ -119,4 +119,11 @@ async def get_unwatched_ideas(*,
     relations = await USERIDEARELATIONS.get_all_by_user_id(user_id=user.id)
     relations_ids = [relation.idea_id for relation in relations]
     result = [idea for idea in ideas if idea.id not in relations_ids]
+
+    if len(result) == 0:
+        raise HTTPException(detail="No ideas to show.", status_code=status.HTTP_404_NOT_FOUND)
+
+    return result[0]
+
+
     return result

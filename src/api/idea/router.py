@@ -252,7 +252,7 @@ async def get_idea_by_id(idea_id: int) -> Idea:
     return result
 
 
-@router.get("/get_unwatched_ideas")
+@router.get("/get_unwatched_idea")
 async def get_unwatched_ideas(*,
                               current_user: AuthenticatedUser = Depends(get_current_user)) -> List[Idea]:
     all_ideas = await IDEA.get_approved()
@@ -260,7 +260,10 @@ async def get_unwatched_ideas(*,
     all_relations_ids = [relation.idea_id for relation in all_relations]
     result = [idea for idea in all_ideas if idea.id not in all_relations_ids]
 
-    return result
+    if len(result) == 0:
+        raise HTTPException(detail="No ideas to show.", status_code=status.HTTP_404_NOT_FOUND)
+
+    return result[0]
 
 
 @router.get("/video_stream")
