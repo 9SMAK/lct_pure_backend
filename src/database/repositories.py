@@ -89,6 +89,12 @@ class UserRepository(Repository):
             res = (await session.execute(statement)).first()
             return self._pydantic_convert_object(res)
 
+    async def get_by_telegram(self, telegram: str) -> _pydantic_schema:
+        async with self._sessionmaker() as session:
+            statement = select(self._table).filter(self._table.telegram == telegram)
+            res = (await session.execute(statement)).first()
+            return self._pydantic_convert_object(res)
+
     async def edit_profile(self, user_id, **kwargs):
         statement = update(self._table).where(
             self._table.id == user_id
@@ -149,9 +155,10 @@ class UserIdeaRelationsRepository(Repository):
     _table = UserIdeaRelations
     _pydantic_schema = schemas.UserIdeaRelations
 
-    async def get_relation_by_user_id(self, user_id: str, relation: int) -> _pydantic_schema:
+    async def get_relation_by_user_id(self, user_id: int, idea_id: int, relation: int) -> _pydantic_schema:
         async with self._sessionmaker() as session:
-            statement = select(self._table).filter(self._table.user_id == user_id, self._table.relation == relation)
+            statement = select(self._table).filter(self._table.user_id == user_id, self._table.relation == relation,
+                                                   self._table.idea_id == idea_id)
             res = (await session.execute(statement))
             return self._pydantic_convert_list(res)
 

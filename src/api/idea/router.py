@@ -112,6 +112,7 @@ async def like_idea(*,
                     current_user: AuthenticatedUser = Depends(get_current_user),
                     idea_id: int) -> OkResponse:
     like_exist = await USERIDEARELATIONS.get_relation_by_user_id(user_id=current_user.id,
+                                                                 idea_id=idea_id,
                                                                  relation=UserIdeaRelations.like)
 
     if like_exist:
@@ -144,6 +145,7 @@ async def dislike_idea(*,
                        current_user: AuthenticatedUser = Depends(get_current_user),
                        idea_id: int) -> OkResponse:
     dislike_exist = await USERIDEARELATIONS.get_relation_by_user_id(user_id=current_user.id,
+                                                                    idea_id=idea_id,
                                                                     relation=UserIdeaRelations.dislike)
     if dislike_exist:
         raise HTTPException(
@@ -171,8 +173,10 @@ async def request_membership(*,
                              current_user: AuthenticatedUser = Depends(get_current_user),
                              idea_id: int) -> OkResponse:
     request_exist = await USERIDEARELATIONS.get_relation_by_user_id(user_id=current_user.id,
+                                                                    idea_id=idea_id,
                                                                     relation=UserIdeaRelations.request_membership)
     member_exist = await USERIDEARELATIONS.get_relation_by_user_id(user_id=current_user.id,
+                                                                   idea_id=idea_id,
                                                                    relation=UserIdeaRelations.member)
 
     if request_exist or member_exist:
