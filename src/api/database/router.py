@@ -50,13 +50,19 @@ async def refresh_table(table_name: str):
     await repo.create_repository()
     return OkResponse()
 
+
 @router.get("/create_table")
-async def refresh_table(table_name: str):
+async def create_table(table_name: str):
     repo = name_to_repo[table_name]
-    await repo.delete_repository()
     await repo.create_repository()
     return OkResponse()
 
+
+@router.get("/drop_table")
+async def drop_table(table_name: str):
+    repo = name_to_repo[table_name]
+    await repo.delete_repository()
+    return OkResponse()
 
 
 @router.get("/get_all_users")
