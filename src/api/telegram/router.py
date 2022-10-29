@@ -11,11 +11,22 @@ from src.database.schemas import Idea
 router = APIRouter(prefix="/telegram", tags=["Telegram"])
 
 
+async def check_telegram(telegram_username):
+    try:
+        user = await USER.get_by_telegram(telegram=telegram_username)
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Telegram not found",
+        )
+    return user
+
+
 @router.post("/like")
 async def like_idea(*,
                     telegram_username: str,
                     idea_id: int) -> OkResponse:
-    user = await USER.get_by_telegram(telegram=telegram_username)
+    user = await check_telegram(telegram_username=telegram_username)
 
     like_exist = await USERIDEARELATIONS.get_relation_by_user_id(user_id=user.id,
                                                                  idea_id=idea_id,
@@ -50,7 +61,7 @@ async def like_idea(*,
 async def dislike_idea(*,
                        telegram_username: str,
                        idea_id: int) -> OkResponse:
-    user = await USER.get_by_telegram(telegram=telegram_username)
+    user = await check_telegram(telegram_username=telegram_username)
 
     dislike_exist = await USERIDEARELATIONS.get_relation_by_user_id(user_id=user.id,
                                                                     idea_id=idea_id,
@@ -81,7 +92,7 @@ async def dislike_idea(*,
 async def request_membership(*,
                              telegram_username: str,
                              idea_id: int) -> OkResponse:
-    user = await USER.get_by_telegram(telegram=telegram_username)
+    user = await check_telegram(telegram_username=telegram_username)
 
     request_exist = await USERIDEARELATIONS.get_relation_by_user_id(user_id=user.id,
                                                                     idea_id=idea_id,
@@ -114,16 +125,13 @@ async def request_membership(*,
 @router.get("/get_unwatched_idea")
 async def get_unwatched_ideas(*,
                               telegram_username: str) -> List[Idea]:
-    user = await USER.get_by_telegram(telegram=telegram_username)
+    user = await check_telegram(telegram_username=telegram_username)
     ideas = await IDEA.get_approved()
     relations = await USERIDEARELATIONS.get_all_by_user_id(user_id=user.id)
     relations_ids = [relation.idea_id for relation in relations]
     result = [idea for idea in ideas if idea.id not in relations_ids]
 
     if len(result) == 0:
-        raise HTTPException(detail="No ideas to show.", status_code=status.HTTP_404_NOT_FOUND)
+        raise HTTPException(detail="No ideas to show", status_code=status.HTTP_404_NOT_FOUND)
 
     return result[0]
-
-
-    return result
