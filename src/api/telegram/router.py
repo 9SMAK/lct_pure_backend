@@ -132,6 +132,6 @@ async def get_unwatched_ideas(*,
     result = [idea for idea in ideas if idea.id not in relations_ids]
 
     if len(result) == 0:
-        raise HTTPException(detail="No ideas to show", status_code=status.HTTP_404_NOT_FOUND)
+        raise HTTPException(detail="No ideas to show", status_code=status.HTTP_400_BAD_REQUEST)
 
     return result[0]

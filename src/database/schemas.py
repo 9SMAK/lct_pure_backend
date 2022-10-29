@@ -55,3 +55,37 @@ class Comment(BaseModel):
 
     class Config:
         orm_mode = True
+
+
+class Skill(BaseModel):
+    id: int
+    name: str
+
+    class Config:
+        orm_mode = True
+
+
+class IdeaTag(BaseModel):
+    id: int
+    name: str
+
+    class Config:
+        orm_mode = True
+
+
+class SkillToUser(BaseModel):
+    id: int
+    user_id: str
+    power: int
+
+    class Config:
+        orm_mode = True
+
+
+class IdeaTagToIdea(BaseModel):
+    id: int
+    user_id: str
+    power: int
+
+    class Config:
+        orm_mode = True

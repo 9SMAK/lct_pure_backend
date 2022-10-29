@@ -27,8 +27,8 @@ async def edit_profile(*, current_user: AuthenticatedUser = Depends(get_current_
 @router.get('/liked_ideas')
 async def get_liked_ideas(current_user: AuthenticatedUser = Depends(get_current_user)) -> List[Idea]:
     result = []
-    relations = await USERIDEARELATIONS.get_relation_by_user_id(user_id=current_user.id,
-                                                                relation=UserIdeaRelations.like)
+    relations = await USERIDEARELATIONS.get_all_relations_by_user_id(user_id=current_user.id,
+                                                                     relation=UserIdeaRelations.like)
     for relation in relations:
         result.append(await IDEA.get_by_id(relation.idea_id))
     return result
@@ -37,8 +37,8 @@ async def get_liked_ideas(current_user: AuthenticatedUser = Depends(get_current_
 @router.get('/disliked_ideas')
 async def get_disliked_ideas(current_user: AuthenticatedUser = Depends(get_current_user)) -> List[Idea]:
     result = []
-    relations = await USERIDEARELATIONS.get_relation_by_user_id(user_id=current_user.id,
-                                                                relation=UserIdeaRelations.dislike)
+    relations = await USERIDEARELATIONS.get_all_relations_by_user_id(user_id=current_user.id,
+                                                                     relation=UserIdeaRelations.dislike)
     for relation in relations:
         result.append(await IDEA.get_by_id(relation.idea_id))
     return result

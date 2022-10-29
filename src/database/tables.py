@@ -62,3 +62,34 @@ class Comment(Base):
     idea_id = Column(Integer, ForeignKey("idea.id"), nullable=False)
     reply_comment_id = Column(Integer)
     text = Column(String, nullable=False)
+
+
+class Skill(Base):
+    __tablename__ = "skill"
+
+    id = Column(Integer, autoincrement=True, primary_key=True, index=True)
+    name = Column(String, nullable=False)
+
+
+class SkillToUser(Base):
+    __tablename__ = "skill_to_user"
+
+    id = Column(Integer, autoincrement=True, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("user.id"), nullable=False)
+    power = Column(String, nullable=False)
+
+
+class IdeaTag(Base):
+    __tablename__ = "idea_tag"
+
+    id = Column(Integer, autoincrement=True, primary_key=True, index=True)
+    name = Column(String, nullable=False)
+
+
+class IdeaTagToIdea(Base):
+    __tablename__ = "idea_tag_to_idea"
+
+    id = Column(Integer, autoincrement=True, primary_key=True, index=True)
+    idea_id = Column(Integer, ForeignKey("idea.id"), nullable=False)
+    power = Column(String, nullable=False)
+

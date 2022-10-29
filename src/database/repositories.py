@@ -11,7 +11,7 @@ import src.database.schemas as schemas
 from .database import DATABASE
 from sqlalchemy.ext.asyncio import AsyncEngine
 
-from src.database.tables import User, UserIdeaRelations, Comment, Idea
+from src.database.tables import User, UserIdeaRelations, Comment, Idea, Skill, SkillToUser, IdeaTag, IdeaTagToIdea
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
@@ -162,6 +162,12 @@ class UserIdeaRelationsRepository(Repository):
             res = (await session.execute(statement))
             return self._pydantic_convert_list(res)
 
+    async def get_all_relations_by_user_id(self, user_id: int, relation: int) -> _pydantic_schema:
+        async with self._sessionmaker() as session:
+            statement = select(self._table).filter(self._table.user_id == user_id, self._table.relation == relation)
+            res = (await session.execute(statement))
+            return self._pydantic_convert_list(res)
+
     async def get_all_by_user_id(self, user_id: str) -> _pydantic_schema:
         async with self._sessionmaker() as session:
             statement = select(self._table).filter(self._table.user_id == user_id)
@@ -184,3 +190,35 @@ class CommentRepository(Repository):
 
 
 COMMENT = CommentRepository(DATABASE.get_engine(), DATABASE.get_sessionmaker())
+
+
+class SkillRepository(Repository):
+    _table = Skill
+    _pydantic_schema = schemas.Skill
+
+
+SKILL = SkillRepository(DATABASE.get_engine(), DATABASE.get_sessionmaker())
+
+
+class SkillToUserRepository(Repository):
+    _table = SkillToUser
+    _pydantic_schema = schemas.SkillToUser
+
+
+SKILLTOUSER = SkillToUserRepository(DATABASE.get_engine(), DATABASE.get_sessionmaker())
+
+
+class IdeaTagRepository(Repository):
+    _table = IdeaTag
+    _pydantic_schema = schemas.IdeaTag
+
+
+IDEATAG = IdeaTagRepository(DATABASE.get_engine(), DATABASE.get_sessionmaker())
+
+
+class IdeaTagToIdeaRepository(Repository):
+    _table = IdeaTagToIdea
+    _pydantic_schema = schemas.IdeaTagToIdea
+
+
+TAGTOIDEA = IdeaTagToIdeaRepository(DATABASE.get_engine(), DATABASE.get_sessionmaker())
