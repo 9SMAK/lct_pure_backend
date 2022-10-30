@@ -204,6 +204,12 @@ class SkillToUserRepository(Repository):
     _table = SkillToUser
     _pydantic_schema = schemas.SkillToUser
 
+    async def get_by_user_id(self, user_id):
+        async with self._sessionmaker() as session:
+            statement = select(self._table).filter(self._table.user_id == user_id)
+            res = (await session.execute(statement))
+            return self._pydantic_convert_list(res)
+
 
 SKILLTOUSER = SkillToUserRepository(DATABASE.get_engine(), DATABASE.get_sessionmaker())
 

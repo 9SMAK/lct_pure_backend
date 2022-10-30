@@ -82,7 +82,7 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     elif swipe_value == 'dislike':
         dislike_request = requests.post(f'{host}/api/telegram/dislike',
                                         params={'telegram_username': query.from_user.username, 'idea_id': idea_id})
-        await query.edit_message_text(text=config.like_symbol, reply_markup=None)
+        await query.edit_message_text(text=config.dislike_symbol, reply_markup=None)
 
     await query.answer()
 

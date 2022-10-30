@@ -65,6 +65,12 @@ async def drop_table(table_name: str):
     return OkResponse()
 
 
+@router.get("/get_table_elems")
+async def get_table_elems(table_name: str):
+    result = await name_to_repo[table_name].get_all()
+    return result
+
+
 @router.get("/get_all_users")
 async def get_all_users():
     result = await USER.get_all()

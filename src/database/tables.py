@@ -76,7 +76,8 @@ class SkillToUser(Base):
 
     id = Column(Integer, autoincrement=True, primary_key=True, index=True)
     user_id = Column(Integer, ForeignKey("user.id"), nullable=False)
-    power = Column(String, nullable=False)
+    skill_id = Column(Integer, ForeignKey("skill.id"), nullable=False)
+    weight = Column(Integer, nullable=False)
 
 
 class IdeaTag(Base):
@@ -91,5 +92,6 @@ class IdeaTagToIdea(Base):
 
     id = Column(Integer, autoincrement=True, primary_key=True, index=True)
     idea_id = Column(Integer, ForeignKey("idea.id"), nullable=False)
-    power = Column(String, nullable=False)
+    tag_id = Column(Integer, ForeignKey("idea_tag.id"), nullable=False)
+    weight = Column(Integer, nullable=False)
 

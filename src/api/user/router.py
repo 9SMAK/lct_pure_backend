@@ -1,8 +1,8 @@
-from typing import List
+from typing import List, Dict
 
 from fastapi import APIRouter, Depends, HTTPException, status
 
-from src.database.repositories import USERIDEARELATIONS, IDEA, USER
+from src.database.repositories import USERIDEARELATIONS, IDEA, USER, SKILLTOUSER
 from src.api.auth.authentication import AuthenticatedUser, get_current_user
 from src.api.schemas import OkResponse
 from src.config import UserIdeaRelations
@@ -22,6 +22,29 @@ async def edit_profile(*, current_user: AuthenticatedUser = Depends(get_current_
             detail="Error while editing profile",
         )
     return OkResponse()
+
+
+@router.post('/edit_skills')
+async def edit_skills(*, current_user: AuthenticatedUser = Depends(get_current_user),
+                      weights: Dict) -> OkResponse:
+    for skill_id, weight in weights.items():
+        result = await SKILLTOUSER.add(
+            skill_id=int(skill_id),
+            user_id=current_user.id,
+            weight=weight
+        )
+        if not result:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Error while editing profile",
+            )
+    return OkResponse()
+
+
+@router.get('/get_my_skills')
+async def get_skills(current_user: AuthenticatedUser = Depends(get_current_user)):
+    skills = await SKILLTOUSER.get_by_user_id(user_id=current_user.id)
+    return skills
 
 
 @router.get('/liked_ideas')

@@ -7,7 +7,7 @@ from src import config as cfg
 from .schemas import RegistrationData, LoginResponse
 from .authentication import authenticate_user, create_access_token, get_current_user, get_password_hash, \
     AuthenticatedUser
-from src.database.repositories import USER
+from src.database.repositories import USER, SKILL
 
 router = APIRouter(prefix="/auth", tags=["Auth"])
 

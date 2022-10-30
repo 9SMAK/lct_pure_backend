@@ -75,8 +75,9 @@ class IdeaTag(BaseModel):
 
 class SkillToUser(BaseModel):
     id: int
-    user_id: str
-    power: int
+    user_id: int
+    skill_id: int
+    weight: int
 
     class Config:
         orm_mode = True
@@ -84,8 +85,9 @@ class SkillToUser(BaseModel):
 
 class IdeaTagToIdea(BaseModel):
     id: int
-    user_id: str
-    power: int
+    idea_id: int
+    tag_id: int
+    weight: int
 
     class Config:
         orm_mode = True

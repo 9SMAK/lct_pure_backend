@@ -6,7 +6,7 @@ from starlette.responses import StreamingResponse, FileResponse
 
 from src.config import UserIdeaRelations, FILES_PATH
 from src.api.schemas import OkResponse
-from src.api.utils import create_dir, async_upload_file, read_from_file, remove_file
+from src.api.helpers import create_dir, async_upload_file, read_from_file, remove_file
 from src.database.repositories import IDEA, USERIDEARELATIONS, COMMENT
 from src.api.auth.authentication import AuthenticatedUser, get_current_user
 from src.api.idea.schemas import CreateIdeaRequest, EditIdeaRequest, CommentRequest
