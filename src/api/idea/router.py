@@ -266,7 +266,7 @@ async def get_unwatched_ideas(*,
     return result
 
 
-@router.get("/video_stream", response_model=StreamingResponse)
+@router.get("/video_stream")
 async def video_stream_endpoint(idea_id: int) -> StreamingResponse:
     idea_info = await IDEA.get_by_id(idea_id)
     try:
@@ -283,7 +283,7 @@ async def video_stream_endpoint(idea_id: int) -> StreamingResponse:
         raise HTTPException(detail="File not found.", status_code=status.HTTP_404_NOT_FOUND)
 
 
-@router.get("/video", response_model=FileResponse)
+@router.get("/video")
 async def video_endpoint(idea_id: int) -> FileResponse:
     idea_info = await IDEA.get_by_id(idea_id)
 
@@ -293,7 +293,7 @@ async def video_endpoint(idea_id: int) -> FileResponse:
     return FileResponse(f'{FILES_PATH}{idea_info.project_directory_id}/{idea_info.video_id}.mp4')
 
 
-@router.get("/photo", response_model=FileResponse)
+@router.get("/photo")
 async def photo_endpoint(idea_id: int) -> FileResponse:
     idea_info = await IDEA.get_by_id(idea_id)
 
