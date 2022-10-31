@@ -16,7 +16,7 @@ router = APIRouter(prefix="/idea", tags=["Idea"])
 
 
 # TODO: add author to members
-@router.post("/create")
+@router.post("/create", response_model=OkResponse)
 async def create_idea(*,
                       current_user: AuthenticatedUser = Depends(get_current_user),
                       photo: UploadFile = File(...),
@@ -59,7 +59,7 @@ async def create_idea(*,
     return OkResponse()
 
 
-@router.post("/edit")
+@router.post("/edit", response_model=OkResponse)
 async def edit_idea(*,
                     current_user: AuthenticatedUser = Depends(get_current_user),
                     idea_id: int,
@@ -107,7 +107,7 @@ async def edit_idea(*,
     return OkResponse()
 
 
-@router.post("/like")
+@router.post("/like", response_model=OkResponse)
 async def like_idea(*,
                     current_user: AuthenticatedUser = Depends(get_current_user),
                     idea_id: int) -> OkResponse:
@@ -140,7 +140,7 @@ async def like_idea(*,
     return OkResponse()
 
 
-@router.post("/dislike")
+@router.post("/dislike", response_model=OkResponse)
 async def dislike_idea(*,
                        current_user: AuthenticatedUser = Depends(get_current_user),
                        idea_id: int) -> OkResponse:
@@ -168,7 +168,7 @@ async def dislike_idea(*,
     return OkResponse()
 
 
-@router.post("/request_membership")
+@router.post("/request_membership", response_model=OkResponse)
 async def request_membership(*,
                              current_user: AuthenticatedUser = Depends(get_current_user),
                              idea_id: int) -> OkResponse:
@@ -200,7 +200,7 @@ async def request_membership(*,
     return OkResponse()
 
 
-@router.post("/comment")
+@router.post("/comment", response_model=OkResponse)
 async def comment_idea(*,
                        current_user: AuthenticatedUser = Depends(get_current_user),
                        comment: CommentRequest) -> OkResponse:
@@ -221,38 +221,38 @@ async def comment_idea(*,
     return OkResponse()
 
 
-@router.get("/get_comments_by_id")
+@router.get("/get_comments_by_id", response_model= List[Comment])
 async def get_comments_by_id(idea_id: int) -> Comment:
     result = await COMMENT.get_comments_by_id(idea_id=idea_id)
     return result
 
 
-@router.get("/get_all_ideas")
+@router.get("/get_all_ideas", response_model=List[Idea])
 async def get_all_ideas() -> List[Idea]:
     result = await IDEA.get_all()
     return result
 
 
-@router.get("/get_approved_ideas")
+@router.get("/get_approved_ideas", response_model=List[Idea])
 async def get_approved_ideas() -> List[Idea]:
     result = await IDEA.get_approved()
     return result
 
 
-@router.get("/get_my_ideas")
+@router.get("/get_my_ideas", response_model=List[Idea])
 async def get_idea_by_id(*,
                          current_user: AuthenticatedUser = Depends(get_current_user)) -> List[Idea]:
     result = await IDEA.get_my_ideas(current_user.id)
     return result
 
 
-@router.get("/get_idea_by_id")
+@router.get("/get_idea_by_id", response_model=Idea)
 async def get_idea_by_id(idea_id: int) -> Idea:
     result = await IDEA.get_by_id(idea_id)
     return result
 
 
-@router.get("/get_unwatched_idea")
+@router.get("/get_unwatched_idea", response_model=List[Idea])
 async def get_unwatched_ideas(*,
                               current_user: AuthenticatedUser = Depends(get_current_user)) -> List[Idea]:
     all_ideas = await IDEA.get_approved()
@@ -260,13 +260,13 @@ async def get_unwatched_ideas(*,
     all_relations_ids = [relation.idea_id for relation in all_relations]
     result = [idea for idea in all_ideas if idea.id not in all_relations_ids]
 
-    if len(result) == 0:
-        raise HTTPException(detail="No ideas to show.", status_code=status.HTTP_404_NOT_FOUND)
+    # if len(result) == 0:
+    #     raise HTTPException(detail="No ideas to show.", status_code=status.HTTP_404_NOT_FOUND)
 
-    return result[0]
+    return result
 
 
-@router.get("/video_stream")
+@router.get("/video_stream", response_model=StreamingResponse)
 async def video_stream_endpoint(idea_id: int) -> StreamingResponse:
     idea_info = await IDEA.get_by_id(idea_id)
     try:
@@ -283,7 +283,7 @@ async def video_stream_endpoint(idea_id: int) -> StreamingResponse:
         raise HTTPException(detail="File not found.", status_code=status.HTTP_404_NOT_FOUND)
 
 
-@router.get("/video")
+@router.get("/video", response_model=FileResponse)
 async def video_endpoint(idea_id: int) -> FileResponse:
     idea_info = await IDEA.get_by_id(idea_id)
 
@@ -293,7 +293,7 @@ async def video_endpoint(idea_id: int) -> FileResponse:
     return FileResponse(f'{FILES_PATH}{idea_info.project_directory_id}/{idea_info.video_id}.mp4')
 
 
-@router.get("/photo")
+@router.get("/photo", response_model=FileResponse)
 async def photo_endpoint(idea_id: int) -> FileResponse:
     idea_info = await IDEA.get_by_id(idea_id)
 
