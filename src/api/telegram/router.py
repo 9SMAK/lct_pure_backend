@@ -22,7 +22,7 @@ async def check_telegram(telegram_username):
     return user
 
 
-@router.post("/like")
+@router.post("/like", response_model=OkResponse)
 async def like_idea(*,
                     telegram_username: str,
                     idea_id: int) -> OkResponse:
@@ -57,7 +57,7 @@ async def like_idea(*,
     return OkResponse()
 
 
-@router.post("/dislike")
+@router.post("/dislike", response_model=OkResponse)
 async def dislike_idea(*,
                        telegram_username: str,
                        idea_id: int) -> OkResponse:
@@ -88,7 +88,7 @@ async def dislike_idea(*,
     return OkResponse()
 
 
-@router.post("/request_membership")
+@router.post("/request_membership", response_model=OkResponse)
 async def request_membership(*,
                              telegram_username: str,
                              idea_id: int) -> OkResponse:
@@ -122,7 +122,7 @@ async def request_membership(*,
     return OkResponse()
 
 
-@router.get("/get_unwatched_idea")
+@router.get("/get_unwatched_idea", response_model=Idea)
 async def get_unwatched_ideas(*,
                               telegram_username: str) -> List[Idea]:
     user = await check_telegram(telegram_username=telegram_username)
