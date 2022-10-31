@@ -1,4 +1,5 @@
 import datetime
+from typing import List
 
 from pydantic import BaseModel
 
@@ -8,6 +9,7 @@ class User(BaseModel):
     login: str
     hashed_password: str
     is_admin: bool
+    avatar_id: str = None
     first_name: str = None
     last_name: str = None
     birth: datetime.date = None
@@ -27,8 +29,8 @@ class Idea(BaseModel):
     author: int
     likes_count: int
     comments_count: int
-    project_directory_id: str
-    photo_id: str
+    logo_id: str
+    photo_ids: List
     video_id: str = None
     approved: bool = False
 

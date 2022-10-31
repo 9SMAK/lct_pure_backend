@@ -1,3 +1,5 @@
+from typing import List
+
 from sqlalchemy import Boolean, Column, Integer, String, Date, ForeignKey
 from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.orm import Session, declarative_base
@@ -12,6 +14,7 @@ class User(Base):
     login = Column(String, nullable=False, unique=True)
     hashed_password = Column(String, nullable=False)
     is_admin = Column(Boolean, default=False)
+    avatar_id = Column(String)
     first_name = Column(String)
     last_name = Column(String)
     birth = Column(Date)
@@ -34,8 +37,8 @@ class Idea(Base):
     description = Column(String)
     likes_count = Column(Integer)
     comments_count = Column(Integer)
-    project_directory_id = Column(String, nullable=False)
-    photo_id = Column(String, nullable=False)
+    logo_id = Column(String, nullable=False)
+    photo_ids = Column(ARRAY(String), nullable=False)
     video_id = Column(String)
     approved = Column(Boolean)
 
