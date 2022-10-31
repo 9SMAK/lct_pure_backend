@@ -14,7 +14,6 @@ from telegram.ext import (
     filters
 )
 
-
 logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO
 )
@@ -37,13 +36,14 @@ async def send_next_idea(bot, username, chat_id):
     data = idea_request.json()
 
     if idea_request.status_code == 200:
-        media = [InputMediaPhoto(requests.get(f'{host}/api/idea/photo',
-                                              params={'idea_id': data['id']}).content,
-                                 caption=f'{data["title"]}\n\n{data["description"]}')]
+        media = list([InputMediaPhoto(requests.get(f'{host}/api/static/photo',
+                                                   params={'file_id': file_id}).content) for file_id in
+                      data['photo_ids']])
 
         if data.get('video_id') is not None:
-            media.append(InputMediaVideo(requests.get(f'{host}/api/idea/video',
-                                                      params={'idea_id': data['id']}).content))
+            media.append(InputMediaVideo(requests.get(f'{host}/api/static/video',
+                                                      params={'file_id': data['video_id']}).content,
+                                         caption=f'{data["title"]}\n\n{data["description"]}'))
 
         await bot.send_media_group(chat_id=chat_id,
                                    media=media)

@@ -8,8 +8,8 @@ router = APIRouter(prefix="/admin", tags=["Admin"])
 
 
 @router.post('/approve_idea', response_model=OkResponse)
-async def approve_idea(idea_id: int) -> OkResponse:
-    await IDEA.approve_idea(idea_id=idea_id)
+async def approve_idea(id: int) -> OkResponse:
+    await IDEA.approve_idea(idea_id=id)
     return OkResponse()
 
 
