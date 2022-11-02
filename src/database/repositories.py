@@ -1,16 +1,16 @@
 import logging
-from typing import List, Dict
+import src.database.schemas as schemas
 
+from typing import List, Dict
 from pydantic import BaseModel
 from sqlalchemy import select, delete, update
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.sql.ddl import DropTable, CreateTable
-
-import src.database.schemas as schemas
 from .database import DATABASE
 from sqlalchemy.ext.asyncio import AsyncEngine
 
+from src.config import RelationsTypes
 from src.database.tables import User, UserIdeaRelations, Comment, Idea, Skill, SkillToUser, IdeaTag, IdeaTagToIdea
 
 logger = logging.getLogger(__name__)
@@ -81,7 +81,7 @@ class Repository:
 
 class UserRepository(Repository):
     _table = User
-    _pydantic_schema = schemas.User
+    _pydantic_schema = schemas.UserDB
 
     async def get_by_login(self, login: str) -> _pydantic_schema:
         async with self._sessionmaker() as session:
@@ -118,7 +118,7 @@ class IdeaRepository(Repository):
 
     async def get_my_ideas(self, user_id):
         async with self._sessionmaker() as session:
-            statement = select(self._table).filter(self._table.author == user_id)
+            statement = select(self._table).filter(self._table.author_id == user_id)
             res = (await session.execute(statement))
             return self._pydantic_convert_list(res)
 
@@ -168,11 +168,33 @@ class UserIdeaRelationsRepository(Repository):
             res = (await session.execute(statement))
             return self._pydantic_convert_list(res)
 
-    async def get_all_by_user_id(self, user_id: str) -> _pydantic_schema:
+    async def get_all_by_user_id(self, user_id: int) -> _pydantic_schema:
         async with self._sessionmaker() as session:
             statement = select(self._table).filter(self._table.user_id == user_id)
             res = (await session.execute(statement))
             return self._pydantic_convert_list(res)
+
+    async def get_all_members(self, idea_id: int) -> _pydantic_schema:
+        async with self._sessionmaker() as session:
+            statement = select(self._table).filter(self._table.id == idea_id,
+                                                   self._table.relation == RelationsTypes.member)
+            res = (await session.execute(statement))
+            return self._pydantic_convert_list(res)
+
+    async def get_all_members_requests(self, idea_id: int) -> _pydantic_schema:
+        async with self._sessionmaker() as session:
+            statement = select(self._table).filter(self._table.id == idea_id,
+                                                   self._table.relation == RelationsTypes.request_membership)
+            res = (await session.execute(statement))
+            return self._pydantic_convert_list(res)
+
+    async def accept_membership(self, idea_id, user_id):
+        statement = update(self._table).where(
+            self._table.idea_id == idea_id,
+            self._table.user_id == user_id,
+            self._table.relation == RelationsTypes.request_membership
+        ).values(relation=RelationsTypes.member)
+        await self.update_values(statement)
 
 
 USERIDEARELATIONS = UserIdeaRelationsRepository(DATABASE.get_engine(), DATABASE.get_sessionmaker())

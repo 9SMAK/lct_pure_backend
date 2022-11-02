@@ -2,17 +2,22 @@ import uuid
 from typing import List
 
 from fastapi import APIRouter, Depends, UploadFile, Body, File, HTTPException, status
-from starlette.responses import StreamingResponse, FileResponse
-
-from src.config import UserIdeaRelations, FILES_PATH
+from src.config import RelationsTypes, FILES_PATH
 from src.api.schemas import OkResponse
 from src.api.helpers import create_dir, async_upload_file, read_from_file, remove_file
-from src.database.repositories import IDEA, USERIDEARELATIONS, COMMENT
+from src.database.repositories import IDEA, USERIDEARELATIONS, COMMENT, USER
 from src.api.auth.authentication import AuthenticatedUser, get_current_user
-from src.api.idea.schemas import CreateIdeaRequest, EditIdeaRequest, CommentRequest
+from src.api.idea.schemas import CreateIdeaRequest, EditIdeaRequest, CommentRequest, IdeaResponse, TeamRequest
 from src.database.schemas import Idea, Comment
 
 router = APIRouter(prefix="/idea", tags=["Idea"])
+
+
+async def convert_to_req_idea(idea: Idea):
+    user = await USER.get_by_id(id=idea.author_id)
+    members = await USERIDEARELATIONS.get_all_members(idea_id=idea.id)
+    members = [await USER.get_by_id(id=member.user_id) for member in members]
+    return IdeaResponse(**idea.dict(), author=user, members=members)
 
 
 # TODO: add author to members
@@ -30,7 +35,7 @@ async def create_idea(*,
     idea = await IDEA.add(
         title=info.title,
         description=info.description,
-        author=current_user.id,
+        author_id=current_user.id,
         likes_count=0,
         comments_count=0,
         logo_id=logo_id,
@@ -49,10 +54,11 @@ async def create_idea(*,
                             file_id=logo_id,
                             ext='.jpg')
 
-    for id, photo in photos:
-        await async_upload_file(file=photo,
-                                file_id=id,
-                                ext='.jpg')
+    if photos:
+        for id, photo in photos:
+            await async_upload_file(file=photo,
+                                    file_id=id,
+                                    ext='.jpg')
 
     if video:
         await async_upload_file(file=video,
@@ -73,7 +79,7 @@ async def edit_idea(*,
     idea = await IDEA.get_by_id(id)
     photos = [(str(uuid.uuid4()), photo) for photo in photos]
 
-    if not idea.author == current_user.id:
+    if not idea.author_id == current_user.id:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="It is not your idea",
@@ -127,7 +133,7 @@ async def like_idea(*,
                     id: int) -> OkResponse:
     like_exist = await USERIDEARELATIONS.get_relation_by_user_id(user_id=current_user.id,
                                                                  idea_id=id,
-                                                                 relation=UserIdeaRelations.like)
+                                                                 relation=RelationsTypes.like)
 
     if like_exist:
         raise HTTPException(
@@ -138,7 +144,7 @@ async def like_idea(*,
     relation = await USERIDEARELATIONS.add(
         user_id=current_user.id,
         idea_id=id,
-        relation=UserIdeaRelations.like
+        relation=RelationsTypes.like
     )
 
     await IDEA.safe_increase_like(
@@ -160,7 +166,7 @@ async def dislike_idea(*,
                        id: int) -> OkResponse:
     dislike_exist = await USERIDEARELATIONS.get_relation_by_user_id(user_id=current_user.id,
                                                                     idea_id=id,
-                                                                    relation=UserIdeaRelations.dislike)
+                                                                    relation=RelationsTypes.dislike)
     if dislike_exist:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -170,7 +176,7 @@ async def dislike_idea(*,
     relation = await USERIDEARELATIONS.add(
         user_id=current_user.id,
         idea_id=id,
-        relation=UserIdeaRelations.dislike
+        relation=RelationsTypes.dislike
     )
 
     if not relation:
@@ -188,10 +194,10 @@ async def request_membership(*,
                              id: int) -> OkResponse:
     request_exist = await USERIDEARELATIONS.get_relation_by_user_id(user_id=current_user.id,
                                                                     idea_id=id,
-                                                                    relation=UserIdeaRelations.request_membership)
+                                                                    relation=RelationsTypes.request_membership)
     member_exist = await USERIDEARELATIONS.get_relation_by_user_id(user_id=current_user.id,
                                                                    idea_id=id,
-                                                                   relation=UserIdeaRelations.member)
+                                                                   relation=RelationsTypes.member)
 
     if request_exist or member_exist:
         raise HTTPException(
@@ -202,7 +208,7 @@ async def request_membership(*,
     relation = await USERIDEARELATIONS.add(
         user_id=current_user.id,
         idea_id=id,
-        relation=UserIdeaRelations.request_membership
+        relation=RelationsTypes.request_membership
     )
 
     if not relation:
@@ -241,40 +247,44 @@ async def get_comments_by_id(id: int) -> Comment:
     return result
 
 
-@router.get("/get_all_ideas", response_model=List[Idea])
-async def get_all_ideas() -> List[Idea]:
-    result = await IDEA.get_all()
+@router.get("/get_all_ideas", response_model=List[IdeaResponse])
+async def get_all_ideas() -> List[IdeaResponse]:
+    ideas = await IDEA.get_all()
+    result = [await convert_to_req_idea(idea) for idea in ideas]
     return result
 
 
-@router.get("/get_approved_ideas", response_model=List[Idea])
-async def get_approved_ideas() -> List[Idea]:
-    result = await IDEA.get_approved()
+@router.get("/get_approved_ideas", response_model=List[IdeaResponse])
+async def get_approved_ideas() -> List[IdeaResponse]:
+    ideas = await IDEA.get_approved()
+    result = [await convert_to_req_idea(idea) for idea in ideas]
     return result
 
 
-@router.get("/get_my_ideas", response_model=List[Idea])
-async def get_idea_by_id(*,
-                         current_user: AuthenticatedUser = Depends(get_current_user)) -> List[Idea]:
-    result = await IDEA.get_my_ideas(current_user.id)
+@router.get("/get_my_ideas", response_model=List[IdeaResponse])
+async def get_my_ideas(*,
+                       current_user: AuthenticatedUser = Depends(get_current_user)) -> List[IdeaResponse]:
+    ideas = await IDEA.get_my_ideas(current_user.id)
+    result = [await convert_to_req_idea(idea) for idea in ideas]
     return result
 
 
-@router.get("/get_idea_by_id", response_model=Idea)
-async def get_idea_by_id(id: int) -> Idea:
-    result = await IDEA.get_by_id(id)
+@router.get("/get_idea_by_id", response_model=IdeaResponse)
+async def get_idea_by_id(id: int) -> IdeaResponse:
+    idea = await IDEA.get_by_id(id)
+    result = await convert_to_req_idea(idea)
     return result
 
 
-@router.get("/get_unwatched_idea", response_model=List[Idea])
+@router.get("/get_unwatched_idea", response_model=List[IdeaResponse])
 async def get_unwatched_ideas(*,
                               current_user: AuthenticatedUser = Depends(get_current_user)) -> List[Idea]:
     all_ideas = await IDEA.get_approved()
     all_relations = await USERIDEARELATIONS.get_all_by_user_id(user_id=current_user.id)
     all_relations_ids = [relation.idea_id for relation in all_relations]
-    result = [idea for idea in all_ideas if idea.id not in all_relations_ids]
+    result = [await convert_to_req_idea(idea) for idea in all_ideas if idea.id not in all_relations_ids]
 
     if len(result) == 0:
         raise HTTPException(detail="No ideas to show.", status_code=status.HTTP_404_NOT_FOUND)
 
-    return result[0]
+    return result

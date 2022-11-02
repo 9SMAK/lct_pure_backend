@@ -1,32 +1,19 @@
 import datetime
 from typing import List
 
+from src.api.user.schemas import User
 from pydantic import BaseModel
 
 
-class User(BaseModel):
-    id: int
-    login: str
+class UserDB(User):
     hashed_password: str
-    is_admin: bool
-    avatar_id: str = None
-    first_name: str = None
-    last_name: str = None
-    birth: datetime.date = None
-    email: str = None
-    phone: str = None
-    telegram: str = None
-    github: str = None
-
-    class Config:
-        orm_mode = True
 
 
 class Idea(BaseModel):
     id: int
     title: str
     description: str
-    author: int
+    author_id: int
     likes_count: int
     comments_count: int
     logo_id: str

@@ -3,7 +3,7 @@ from typing import List
 from fastapi import APIRouter, HTTPException, status
 from starlette.responses import FileResponse
 
-from src.config import UserIdeaRelations, FILES_PATH
+from src.config import RelationsTypes, FILES_PATH
 from src.api.schemas import OkResponse
 from src.database.repositories import IDEA, USERIDEARELATIONS, USER
 from src.database.schemas import Idea
@@ -30,7 +30,7 @@ async def like_idea(*,
 
     like_exist = await USERIDEARELATIONS.get_relation_by_user_id(user_id=user.id,
                                                                  idea_id=idea_id,
-                                                                 relation=UserIdeaRelations.like)
+                                                                 relation=RelationsTypes.like)
 
     if like_exist:
         raise HTTPException(
@@ -41,7 +41,7 @@ async def like_idea(*,
     relation = await USERIDEARELATIONS.add(
         user_id=user.id,
         idea_id=idea_id,
-        relation=UserIdeaRelations.like
+        relation=RelationsTypes.like
     )
 
     await IDEA.safe_increase_like(
@@ -65,7 +65,7 @@ async def dislike_idea(*,
 
     dislike_exist = await USERIDEARELATIONS.get_relation_by_user_id(user_id=user.id,
                                                                     idea_id=idea_id,
-                                                                    relation=UserIdeaRelations.dislike)
+                                                                    relation=RelationsTypes.dislike)
 
     if dislike_exist:
         raise HTTPException(
@@ -76,7 +76,7 @@ async def dislike_idea(*,
     relation = await USERIDEARELATIONS.add(
         user_id=user.id,
         idea_id=idea_id,
-        relation=UserIdeaRelations.dislike
+        relation=RelationsTypes.dislike
     )
 
     if not relation:
@@ -96,10 +96,10 @@ async def request_membership(*,
 
     request_exist = await USERIDEARELATIONS.get_relation_by_user_id(user_id=user.id,
                                                                     idea_id=idea_id,
-                                                                    relation=UserIdeaRelations.request_membership)
+                                                                    relation=RelationsTypes.request_membership)
     member_exist = await USERIDEARELATIONS.get_relation_by_user_id(user_id=user.id,
                                                                    idea_id=idea_id,
-                                                                   relation=UserIdeaRelations.member)
+                                                                   relation=RelationsTypes.member)
 
     if request_exist or member_exist:
         raise HTTPException(
@@ -110,7 +110,7 @@ async def request_membership(*,
     relation = await USERIDEARELATIONS.add(
         user_id=user.id,
         idea_id=idea_id,
-        relation=UserIdeaRelations.request_membership
+        relation=RelationsTypes.request_membership
     )
 
     if not relation:

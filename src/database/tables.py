@@ -32,7 +32,7 @@ class Idea(Base):
     __tablename__ = "idea"
 
     id = Column(Integer, autoincrement=True, primary_key=True, index=True)
-    author = Column(Integer, ForeignKey("user.id"), nullable=False)
+    author_id = Column(Integer, ForeignKey("user.id"), nullable=False)
     title = Column(String, nullable=False, unique=True)
     description = Column(String)
     likes_count = Column(Integer)

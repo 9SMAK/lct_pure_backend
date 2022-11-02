@@ -4,7 +4,7 @@ from typing import List
 from fastapi import APIRouter, Depends, UploadFile, Body, File, HTTPException, status
 from starlette.responses import StreamingResponse, FileResponse
 
-from src.config import UserIdeaRelations, FILES_PATH
+from src.config import RelationsTypes, FILES_PATH
 from src.api.schemas import OkResponse
 from src.api.helpers import create_dir, async_upload_file, read_from_file, remove_file
 from src.database.repositories import IDEA, USERIDEARELATIONS, COMMENT

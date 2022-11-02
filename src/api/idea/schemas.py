@@ -1,5 +1,6 @@
 import json
 from typing import List, Dict
+from src.database.schemas import User, Idea
 
 from pydantic import BaseModel
 
@@ -32,6 +33,16 @@ class EditIdeaRequest(BaseModel):
         if isinstance(value, str):
             return cls(**json.loads(value))
         return value
+
+
+class IdeaResponse(Idea):
+    author: User
+    members: List[User]
+
+
+class TeamRequest(BaseModel):
+    idea: Idea
+    requests: List[User]
 
 
 class CommentRequest(BaseModel):
