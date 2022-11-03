@@ -1,5 +1,5 @@
 from datetime import timedelta, datetime
-from typing import Optional, Union
+from typing import Union
 
 from fastapi import HTTPException, Depends, status
 from fastapi.security import OAuth2PasswordBearer

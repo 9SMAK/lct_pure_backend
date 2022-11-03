@@ -4,10 +4,10 @@ from typing import List
 from fastapi import APIRouter, Depends, UploadFile, Body, File, HTTPException, status
 from src.config import RelationsTypes, FILES_PATH
 from src.api.schemas import OkResponse
-from src.api.helpers import create_dir, async_upload_file, read_from_file, remove_file
+from src.api.helpers import create_dir, async_upload_file, remove_file
 from src.database.repositories import IDEA, USERIDEARELATIONS, COMMENT, USER
 from src.api.auth.authentication import AuthenticatedUser, get_current_user
-from src.api.idea.schemas import CreateIdeaRequest, EditIdeaRequest, CommentRequest, IdeaResponse, TeamRequest
+from src.api.idea.schemas import CreateIdeaRequest, EditIdeaRequest, CommentRequest, IdeaResponse
 from src.database.schemas import Idea, Comment
 
 router = APIRouter(prefix="/idea", tags=["Idea"])
@@ -47,7 +47,7 @@ async def create_idea(*,
     if not idea:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Проект с таким именем существует",
+            detail="Project with same name exists",
         )
 
     await async_upload_file(file=logo,

@@ -60,10 +60,9 @@ async def edit_skills(*, current_user: AuthenticatedUser = Depends(get_current_u
 
 
 @router.post('/accept_request', response_model=OkResponse)
-async def edit_skills(*, current_user: AuthenticatedUser = Depends(get_current_user),
-                      user_id: int,
-                      idea_id: int) -> OkResponse:
-
+async def accept_request(*, current_user: AuthenticatedUser = Depends(get_current_user),
+                         user_id: int,
+                         idea_id: int) -> OkResponse:
     idea = await IDEA.get_by_id(id=idea_id)
     # check if not author
     if not current_user.id == idea.author_id:
@@ -113,6 +112,7 @@ async def get_requests_in_team(*,
         requests = [await USER.get_by_id(id=relation.user_id) for relation in relations]
         result.append(TeamRequest(idea=idea, requests=requests))
     return result
+
 
 @router.get("/get_all_users", response_model=List[User])
 async def get_all_users():

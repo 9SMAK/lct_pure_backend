@@ -1,8 +1,8 @@
 import json
 from typing import List
-from src.database.schemas import User, Idea
-
 from pydantic import BaseModel
+
+from src.database.schemas import User, Idea
 
 
 class CreateIdeaRequest(BaseModel):
