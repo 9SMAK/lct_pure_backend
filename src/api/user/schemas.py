@@ -6,8 +6,7 @@ from pydantic import BaseModel
 
 class EditProfileRequest(BaseModel):
     login: str = None
-    first_name: str = None
-    last_name: str = None
+    name: str = None
     birth: datetime.date = None
     email: str = None
     phone: str = None
@@ -35,13 +34,21 @@ class User(BaseModel):
     login: str
     is_admin: bool
     avatar_id: str = None
-    first_name: str = None
-    last_name: str = None
+    name: str = None
     birth: datetime.date = None
     email: str = None
     phone: str = None
     telegram: str = None
     github: str = None
+
+    class Config:
+        orm_mode = True
+
+
+class ShortUser(BaseModel):
+    id: int
+    login: str
+    avatar_id: str = None
 
     class Config:
         orm_mode = True

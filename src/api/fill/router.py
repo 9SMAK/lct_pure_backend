@@ -28,7 +28,7 @@ faker = Faker(["ru_RU"])
 
 
 async def fake_users(count):
-    cur_id = 1
+    cur_id = 2
     while cur_id <= count + 1:
         try:
             profile = faker.simple_profile()
@@ -40,10 +40,8 @@ async def fake_users(count):
                 hashed_password=get_password_hash(f'{profile["username"]}1'),
             )
 
-            first_name, last_name, _ = profile["name"].split(' ')
             edit_info = EditProfileRequest(
-                first_name=first_name,
-                last_name=last_name,
+                name=profile["name"],
                 email=profile["mail"],
                 telegram=profile2["username"],
                 github=profile3["username"]

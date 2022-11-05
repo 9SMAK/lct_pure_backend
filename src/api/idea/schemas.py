@@ -3,6 +3,7 @@ from typing import List
 from pydantic import BaseModel
 
 from src.database.schemas import User, Idea
+from src.api.user.schemas import ShortUser
 
 
 class CreateIdeaRequest(BaseModel):
@@ -36,7 +37,7 @@ class EditIdeaRequest(BaseModel):
 
 
 class IdeaResponse(Idea):
-    author: User
+    author: ShortUser
     members: List[User]
 
 

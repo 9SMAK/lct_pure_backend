@@ -8,6 +8,7 @@ from src.api.helpers import create_dir, async_upload_file, remove_file
 from src.database.repositories import IDEA, USERIDEARELATIONS, COMMENT, USER
 from src.api.auth.authentication import AuthenticatedUser, get_current_user
 from src.api.idea.schemas import CreateIdeaRequest, EditIdeaRequest, CommentRequest, IdeaResponse
+from src.api.user.schemas import User, ShortUser
 from src.database.schemas import Idea, Comment
 
 router = APIRouter(prefix="/idea", tags=["Idea"])
@@ -17,7 +18,7 @@ async def convert_to_req_idea(idea: Idea):
     user = await USER.get_by_id(id=idea.author_id)
     members = await USERIDEARELATIONS.get_all_members(idea_id=idea.id)
     members = [await USER.get_by_id(id=member.user_id) for member in members]
-    return IdeaResponse(**idea.dict(), author=user, members=members)
+    return IdeaResponse(**idea.dict(), author=ShortUser(**user.dict()), members=members)
 
 
 # TODO: add author to members
