@@ -16,7 +16,7 @@ from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, Body
 
 from src.api.helpers import async_upload_file, remove_file
 from src.api.idea.schemas import TeamRequest
-from src.database.repositories import USERIDEARELATIONS, IDEA, USER, SKILLTOUSER, COMMENT, TAGTOIDEA
+from src.database.repositories import USERIDEARELATIONS, IDEA, USER, SKILLTOUSER, COMMENT, TAGTOIDEA, SKILL, IDEATAG
 from src.api.auth.authentication import AuthenticatedUser, get_current_user
 from src.api.schemas import OkResponse
 from src.config import RelationsTypes
@@ -137,11 +137,15 @@ async def fill_users(users_count: int):
     await SKILLTOUSER.delete_repository()
     await TAGTOIDEA.delete_repository()
     await COMMENT.delete_repository()
+    await SKILL.delete_repository()
+    await IDEATAG.delete_repository()
     await IDEA.delete_repository()
     await USER.delete_repository()
 
     await USER.create_repository()
     await IDEA.create_repository()
+    await SKILL.create_repository()
+    await IDEATAG.create_repository()
     await SKILLTOUSER.create_repository()
     await TAGTOIDEA.create_repository()
     await COMMENT.create_repository()
