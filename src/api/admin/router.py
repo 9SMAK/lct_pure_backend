@@ -6,6 +6,7 @@ from PIL import ImageFont, Image, ImageDraw
 
 from src.api.schemas import OkResponse
 from src.database.repositories import IDEA, SKILL, IDEATAG
+from src.config import FILES_PATH
 
 router = APIRouter(prefix="/admin", tags=["Admin"])
 
@@ -13,13 +14,12 @@ size = 200
 
 
 async def generate_circles(text, circle_id, color="red"):
-    font = ImageFont.truetype('src/api/admin/arial.ttf', 30)
+    font = ImageFont.truetype(f'src/api/admin/arial.ttf', 30)
     image = Image.new('RGBA', (size, size))
     draw = ImageDraw.Draw(image)
     draw.ellipse((0, 0, size, size), fill=color)
     draw.text((size // 2, size // 2), text, font=font, align="center", anchor="mm")
-    image.save(f'src/files/{circle_id}.png')
-    # shutil.copyfile(f'{circle_id}.png', f'src/../files/{circle_id}.png')
+    image.save(f'{FILES_PATH}{circle_id}.png')
 
 
 # TODO check if admin

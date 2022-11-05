@@ -1,27 +1,19 @@
 import os
 import random
 import shutil
-
-from faker import Faker
-
-from src.api.auth.authentication import get_password_hash
-from src.api.user.schemas import EditProfileRequest
-from src.database.repositories import USER
-
 import uuid
 import json
-from typing import List, Dict
 
-from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, Body
+from faker import Faker
+from fastapi import APIRouter
 
-from src.api.helpers import async_upload_file, remove_file
-from src.api.idea.schemas import TeamRequest
+from src.api.admin.router import generate_circles
+from src.api.auth.authentication import get_password_hash
 from src.database.repositories import USERIDEARELATIONS, IDEA, USER, SKILLTOUSER, COMMENT, TAGTOIDEA, SKILL, IDEATAG
-from src.api.auth.authentication import AuthenticatedUser, get_current_user
 from src.api.schemas import OkResponse
 from src.config import RelationsTypes
-from src.api.user.schemas import EditProfileRequest, EditSkillsRequest
-from src.database.schemas import Idea, SkillToUser, User
+from src.api.user.schemas import EditProfileRequest
+from src.config import FILES_PATH
 
 router = APIRouter(prefix="/fake", tags=["Faker"])
 faker = Faker(["ru_RU"])
@@ -110,7 +102,7 @@ async def make_relation(users, ideas, type):
         if like_exist or dislike_exist:
             continue
 
-        relation = await USERIDEARELATIONS.add(
+        await USERIDEARELATIONS.add(
             user_id=random_user,
             idea_id=random_idea,
             relation=type
@@ -131,8 +123,51 @@ async def fake_relations():
     # await make_relation(users, ideas, RelationsTypes.member)
 
 
+async def fake_skills():
+    lables = [
+        "Python",
+        "Databases",
+        "Frontend",
+        "React",
+        "Backend",
+        "Postgres",
+        "Devops",
+        "Fullstack",
+        "Django",
+        "Javascript",
+    ]
+
+    for label in lables:
+        circle_id = str(uuid.uuid4())
+        await generate_circles(text=label, circle_id=circle_id, color="red")
+
+        await SKILL.add(name=label,
+                        circle_id=circle_id)
+
+
+async def fake_ideatags():
+    lables = [
+        "Искуственный\n интеллект",
+        "Городская\n инфр-ра",
+        "Мобильная\n разработка",
+        "Финтех",
+        "Веб-сервис",
+        "Образование",
+        "Медицина"
+    ]
+
+    for label in lables:
+        circle_id = str(uuid.uuid4())
+        await generate_circles(text=label, circle_id=circle_id, color="red")
+
+        await IDEATAG.add(name=label,
+                          circle_id=circle_id)
+
+
 @router.post('/fake_db', response_model=OkResponse)
 async def fill_users(users_count: int):
+    shutil.rmtree({FILES_PATH})
+
     await USERIDEARELATIONS.delete_repository()
     await SKILLTOUSER.delete_repository()
     await TAGTOIDEA.delete_repository()
@@ -163,6 +198,8 @@ async def fill_users(users_count: int):
     await USER.edit_profile(1, **edit_info.dict(exclude_none=True))
 
     await fake_users(users_count)
+    await fake_skills()
+    await fake_ideatags()
     await fake_ideas()
     await fake_relations()
 
