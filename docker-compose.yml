@@ -24,12 +24,12 @@ services:
       ACCESS_TOKEN_EXPIRE_MINUTES: $ACCESS_TOKEN_EXPIRE_MINUTES
     volumes:
     - ./files:/server/src/files
-#  telegram:
-#    build: telegram_bot/
-#    command: python3 bot.py
-#    environment:
-#      TG_BOT_TOKEN: $TG_BOT_TOKEN
-#      HOST: $HOST
-#    depends_on:
-#      - postgres
-#      - server
+  telegram:
+    build: telegram_bot/
+    command: python3 bot.py
+    environment:
+      TG_BOT_TOKEN: $TG_BOT_TOKEN
+      HOST: $HOST
+    depends_on:
+      - postgres
+      - server

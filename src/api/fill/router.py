@@ -61,6 +61,10 @@ async def fake_ideas():
 
     users = await USER.get_all()
     for idx, idea in enumerate(ideas):
+
+        if idx + 1 in [1, 3, 9, 16, 18, 21, 24, 28, 29, 30]:
+            continue
+
         try:
             random_user = random.randint(1, len(users) - 1)
 
