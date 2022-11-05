@@ -49,6 +49,7 @@ class Comment(BaseModel):
 class Skill(BaseModel):
     id: int
     name: str
+    circle_id: str
 
     class Config:
         orm_mode = True
@@ -57,6 +58,7 @@ class Skill(BaseModel):
 class IdeaTag(BaseModel):
     id: int
     name: str
+    circle_id: str
 
     class Config:
         orm_mode = True

@@ -71,6 +71,7 @@ class Skill(Base):
 
     id = Column(Integer, autoincrement=True, primary_key=True, index=True)
     name = Column(String, nullable=False)
+    circle_id = Column(String, nullable=False)
 
 
 class SkillToUser(Base):
@@ -87,6 +88,7 @@ class IdeaTag(Base):
 
     id = Column(Integer, autoincrement=True, primary_key=True, index=True)
     name = Column(String, nullable=False)
+    circle_id = Column(String, nullable=False)
 
 
 class IdeaTagToIdea(Base):

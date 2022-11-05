@@ -1,3 +1,4 @@
+import os
 import uuid
 from typing import List
 
@@ -39,4 +40,6 @@ async def video_endpoint(file_id: str) -> FileResponse:
 
 @router.get("/photo")
 async def photo_endpoint(file_id: str) -> FileResponse:
-    return FileResponse(f'{FILES_PATH}{file_id}.jpg')
+    if f'{FILES_PATH}{file_id}.jpg' in os.listdir('src/files/'):
+        return FileResponse(f'{FILES_PATH}{file_id}.jpg')
+    return FileResponse(f'{FILES_PATH}{file_id}.png')

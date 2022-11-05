@@ -132,7 +132,7 @@ async def fake_relations():
 
 
 @router.post('/fake_db', response_model=OkResponse)
-async def fill_users():
+async def fill_users(users_count: int):
     await USERIDEARELATIONS.delete_repository()
     await SKILLTOUSER.delete_repository()
     await TAGTOIDEA.delete_repository()
@@ -158,7 +158,7 @@ async def fill_users():
 
     await USER.edit_profile(1, **edit_info.dict(exclude_none=True))
 
-    await fake_users(100)
+    await fake_users(users_count)
     await fake_ideas()
     await fake_relations()
 

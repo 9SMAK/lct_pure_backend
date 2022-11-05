@@ -13,3 +13,4 @@ bcrypt~=4.0.0
 aiofiles~=22.1.0
 python-telegram-bot~=20.0a4
 faker~=15.2.0
+pillow~=9.3.0
