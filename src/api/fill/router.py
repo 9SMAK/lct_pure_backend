@@ -166,7 +166,7 @@ async def fake_ideatags():
 
 @router.post('/fake_db', response_model=OkResponse)
 async def fill_users(users_count: int):
-    shutil.rmtree('src/files')
+    shutil.rmtree('src/files', ignore_errors=True)
 
     await USERIDEARELATIONS.delete_repository()
     await SKILLTOUSER.delete_repository()
