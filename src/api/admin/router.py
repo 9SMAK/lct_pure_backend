@@ -9,7 +9,7 @@ from src.database.repositories import IDEA, SKILL, IDEATAG
 
 router = APIRouter(prefix="/admin", tags=["Admin"])
 
-size = 80
+size = 200
 
 
 async def generate_circles(text, circle_id, color="red"):
