@@ -1,8 +1,5 @@
 from fastapi import APIRouter
-
-from src.api.schemas import OkResponse
-from src.database.repositories import USER, IDEA, SKILL, IDEATAG
-from src.database.schemas import User, Skill, IdeaTag
+from src.database.repositories import SKILL, IDEATAG
 
 router = APIRouter(prefix="/utils", tags=["Utils"])
 
@@ -17,5 +14,3 @@ async def get_skills():
 async def get_idea_tags():
     result = await IDEATAG.get_all()
     return result
-
-
