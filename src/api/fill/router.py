@@ -149,6 +149,17 @@ async def fill_users():
     await COMMENT.create_repository()
     await USERIDEARELATIONS.create_repository()
 
+    await USER.add(
+        login='sam',
+        hashed_password=get_password_hash(f'123'),
+    )
+
+    edit_info = EditProfileRequest(
+        telegram='akanolifer',
+    )
+
+    await USER.edit_profile(1, **edit_info.dict(exclude_none=True))
+
     await fake_users(100)
     await fake_ideas()
     await fake_relations()
