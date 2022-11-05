@@ -69,22 +69,22 @@ async def fake_ideas():
             random_user = random.randint(1, len(users) - 1)
 
             logo_id = str(uuid.uuid4())
-            video_id = str(uuid.uuid4()) if f'{idx + 1}.mp4' in os.listdir('src/api/fill/videos') else None
+            video_id = str(uuid.uuid4()) if f'{idx}.mp4' in os.listdir('src/api/fill/videos') else None
             photos = (str(uuid.uuid4()))
 
             if f'{idx + 1}.jpg' in os.listdir('src/api/fill/images'):
-                photo = f'src/api/fill/images/{idx + 1}.jpg'
+                photo = f'src/api/fill/images/{idx}.jpg'
             else:
-                photo = f'src/api/fill/images/{idx + 1}.png'
+                photo = f'src/api/fill/images/{idx}.png'
 
             shutil.copyfile(photo, f'src/files/{photos}.jpg')
 
             if video_id:
-                shutil.copyfile(f'src/api/fill/videos/{idx + 1}.mp4', f'src/files/{video_id}.mp4')
+                shutil.copyfile(f'src/api/fill/videos/{idx}.mp4', f'src/files/{video_id}.mp4')
 
             idea = await IDEA.add(
                 title=idea["name"],
-                description=idea["name"],
+                description=idea["description"],
                 author_id=random_user,
                 likes_count=0,
                 comments_count=0,
