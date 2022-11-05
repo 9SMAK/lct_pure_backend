@@ -52,39 +52,36 @@ async def fake_ideas():
     users = await USER.get_all()
     for idx, idea in enumerate(ideas):
 
-        if idx + 1 in [1, 3, 9, 16, 18, 21, 24, 28, 29, 30]:
-            continue
+        # if idx + 1 in [1, 3, 9, 16, 18, 21, 24, 28, 29, 30]:
+        #     continue
 
-        try:
-            random_user = random.randint(1, len(users) - 1)
+        random_user = random.randint(1, len(users) - 1)
 
-            logo_id = str(uuid.uuid4())
-            video_id = str(uuid.uuid4()) if f'{idx}.mp4' in os.listdir('src/api/fill/videos') else None
-            photos = (str(uuid.uuid4()))
+        logo_id = str(uuid.uuid4())
+        video_id = str(uuid.uuid4()) if f'{idx}.mp4' in os.listdir('src/api/fill/videos') else None
+        photos = (str(uuid.uuid4()))
 
-            if f'{idx + 1}.jpg' in os.listdir('src/api/fill/images'):
-                photo = f'src/api/fill/images/{idx}.jpg'
-            else:
-                photo = f'src/api/fill/images/{idx}.png'
+        if f'{idx}.jpg' in os.listdir('src/api/fill/images'):
+            photo = f'src/api/fill/images/{idx}.jpg'
+        else:
+            photo = f'src/api/fill/images/{idx}.png'
 
-            shutil.copyfile(photo, f'src/files/{photos}.jpg')
+        shutil.copyfile(photo, f'src/files/{photos}.jpg')
 
-            if video_id:
-                shutil.copyfile(f'src/api/fill/videos/{idx}.mp4', f'src/files/{video_id}.mp4')
+        if video_id:
+            shutil.copyfile(f'src/api/fill/videos/{idx}.mp4', f'src/files/{video_id}.mp4')
 
-            idea = await IDEA.add(
-                title=idea["name"],
-                description=idea["description"],
-                author_id=random_user,
-                likes_count=0,
-                comments_count=0,
-                logo_id=logo_id,
-                photo_ids=[photos],
-                video_id=video_id,
-                approved=True
-            )
-        except Exception as e:
-            pass
+        await IDEA.add(
+            title=idea["name"],
+            description=idea["description"],
+            author_id=random_user,
+            likes_count=0,
+            comments_count=0,
+            logo_id=logo_id,
+            photo_ids=[photos],
+            video_id=video_id,
+            approved=True
+        )
 
 
 async def make_relation(users, ideas, type):
