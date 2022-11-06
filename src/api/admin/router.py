@@ -10,11 +10,11 @@ from src.config import FILES_PATH
 
 router = APIRouter(prefix="/admin", tags=["Admin"])
 
-size = 200
+size = 100
 
 
 async def generate_circles(text, circle_id, color="red"):
-    font = ImageFont.truetype(f'src/api/admin/arial.ttf', 30)
+    font = ImageFont.truetype(f'src/api/admin/arial.ttf', 15)
     image = Image.new('RGBA', (size, size))
     draw = ImageDraw.Draw(image)
     draw.ellipse((0, 0, size, size), fill=color)
