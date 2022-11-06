@@ -82,3 +82,13 @@ class IdeaTagToIdea(BaseModel):
 
     class Config:
         orm_mode = True
+
+
+class UserPreferences(BaseModel):
+    id: int
+    user_id: int
+    tag_id: int
+    weight: int
+
+    class Config:
+        orm_mode = True

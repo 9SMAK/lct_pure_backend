@@ -9,7 +9,7 @@ from fastapi import APIRouter
 
 from src.api.admin.router import generate_circles
 from src.api.auth.authentication import get_password_hash
-from src.database.repositories import USERIDEARELATIONS, IDEA, USER, SKILLTOUSER, COMMENT, TAGTOIDEA, SKILL, IDEATAG
+from src.database.repositories import USERIDEARELATIONS, IDEA, USER, SKILLTOUSER, COMMENT, TAGTOIDEA, SKILL, IDEATAG, USERPREFERENCES
 from src.api.schemas import OkResponse
 from src.config import RelationsTypes
 from src.api.user.schemas import EditProfileRequest
@@ -167,6 +167,7 @@ async def fill_users(users_count: int):
 
     await USERIDEARELATIONS.delete_repository()
     await SKILLTOUSER.delete_repository()
+    await USERPREFERENCES.delete_repository()
     await TAGTOIDEA.delete_repository()
     await COMMENT.delete_repository()
     await SKILL.delete_repository()
@@ -179,6 +180,7 @@ async def fill_users(users_count: int):
     await SKILL.create_repository()
     await IDEATAG.create_repository()
     await SKILLTOUSER.create_repository()
+    await USERPREFERENCES.create_repository()
     await TAGTOIDEA.create_repository()
     await COMMENT.create_repository()
     await USERIDEARELATIONS.create_repository()

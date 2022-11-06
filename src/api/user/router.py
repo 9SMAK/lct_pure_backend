@@ -5,7 +5,7 @@ from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, Body
 
 from src.api.helpers import async_upload_file, remove_file
 from src.api.idea.schemas import TeamRequest
-from src.database.repositories import USERIDEARELATIONS, IDEA, USER, SKILLTOUSER
+from src.database.repositories import USERIDEARELATIONS, IDEA, USER, SKILLTOUSER, USERPREFERENCES
 from src.api.auth.authentication import AuthenticatedUser, get_current_user
 from src.api.schemas import OkResponse
 from src.config import RelationsTypes
@@ -48,6 +48,23 @@ async def edit_skills(*, current_user: AuthenticatedUser = Depends(get_current_u
     for skill in weights:
         result = await SKILLTOUSER.add(
             skill_id=int(skill.id),
+            user_id=current_user.id,
+            weight=skill.weight
+        )
+        if not result:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Error while editing profile",
+            )
+    return OkResponse()
+
+
+@router.post('/edit_preferences', response_model=OkResponse)
+async def edit_preferences(*, current_user: AuthenticatedUser = Depends(get_current_user),
+                           weights: List[EditSkillsRequest]) -> OkResponse:
+    for skill in weights:
+        result = await USERPREFERENCES.add(
+            tag_id=int(skill.id),
             user_id=current_user.id,
             weight=skill.weight
         )

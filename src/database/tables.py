@@ -99,3 +99,12 @@ class IdeaTagToIdea(Base):
     tag_id = Column(Integer, ForeignKey("idea_tag.id"), nullable=False)
     weight = Column(Integer, nullable=False)
 
+
+class UserPreferences(Base):
+    __tablename__ = "user_preferences"
+
+    id = Column(Integer, autoincrement=True, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("idea.id"), nullable=False)
+    tag_id = Column(Integer, ForeignKey("idea_tag.id"), nullable=False)
+    weight = Column(Integer, nullable=False)
+

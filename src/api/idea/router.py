@@ -5,10 +5,10 @@ from fastapi import APIRouter, Depends, UploadFile, Body, File, HTTPException, s
 from src.config import RelationsTypes, FILES_PATH
 from src.api.schemas import OkResponse
 from src.api.helpers import create_dir, async_upload_file, remove_file
-from src.database.repositories import IDEA, USERIDEARELATIONS, COMMENT, USER
+from src.database.repositories import IDEA, USERIDEARELATIONS, COMMENT, USER, TAGTOIDEA
 from src.api.auth.authentication import AuthenticatedUser, get_current_user
 from src.api.idea.schemas import CreateIdeaRequest, EditIdeaRequest, CommentRequest, IdeaResponse
-from src.api.user.schemas import User, ShortUser
+from src.api.user.schemas import User, ShortUser, EditSkillsRequest
 from src.database.schemas import Idea, Comment
 
 router = APIRouter(prefix="/idea", tags=["Idea"])
@@ -31,7 +31,7 @@ async def create_idea(*,
                       info: CreateIdeaRequest = Body(...)) -> OkResponse:
     logo_id = str(uuid.uuid4())
     video_id = str(uuid.uuid4()) if video else None
-    photos = [(str(uuid.uuid4()), photo) for photo in photos]
+    photos = [(str(uuid.uuid4()), photo) for photo in photos] if photos else []
 
     idea = await IDEA.add(
         title=info.title,
@@ -125,6 +125,33 @@ async def edit_idea(*,
             detail="Error while modifying base",
         )
 
+    return OkResponse()
+
+
+@router.post('/edit_tags', response_model=OkResponse)
+async def edit_tags(*, current_user: AuthenticatedUser = Depends(get_current_user),
+                           idea_id: int,
+                           weights: List[EditSkillsRequest]) -> OkResponse:
+
+    idea = await IDEA.get_by_id(idea_id)
+
+    if not idea.author_id == current_user.id:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="It is not your idea",
+        )
+
+    for skill in weights:
+        result = await TAGTOIDEA.add(
+            tag_id=int(skill.id),
+            idea_id=idea_id,
+            weight=skill.weight
+        )
+        if not result:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Error while editing profile",
+            )
     return OkResponse()
 
 
