@@ -69,7 +69,7 @@ async def fake_ideas():
             logo = f'src/api/fill/images/{idx}.jpg'
 
         shutil.copyfile(photo, f'src/files/{photos}.jpg')
-        shutil.copyfile(photo, f'src/files/{logo}.jpg')
+        shutil.copyfile(photo, f'src/files/{logo_id}.jpg')
 
         if video_id:
             shutil.copyfile(f'src/api/fill/videos/{idx}.mp4', f'src/files/{video_id}.mp4')
