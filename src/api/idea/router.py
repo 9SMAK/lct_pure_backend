@@ -304,9 +304,9 @@ async def get_idea_by_id(id: int) -> IdeaResponse:
     return result
 
 
-@router.get("/get_unwatched_idea", response_model=List[IdeaResponse])
+@router.get("/get_unwatched_idea", response_model=IdeaResponse)
 async def get_unwatched_ideas(*,
-                              current_user: AuthenticatedUser = Depends(get_current_user)) -> List[Idea]:
+                              current_user: AuthenticatedUser = Depends(get_current_user)) -> Idea:
     ideas = await IDEA.get_approved()
     relations = await USERIDEARELATIONS.get_all_by_user_id(user_id=current_user.id)
     relations_ids = [relation.idea_id for relation in relations]
