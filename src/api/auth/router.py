@@ -33,7 +33,7 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()):
     )
 
 
-@router.post("/registration")
+@router.post("/registration", response_model=LoginResponse)
 async def registration(data: RegistrationData):
     user = await USER.add(
         login=data.login,
@@ -45,6 +45,25 @@ async def registration(data: RegistrationData):
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Login already in use",
         )
+
+    user = await authenticate_user(data.login, data.password)
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Incorrect username or password",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+    authenticated_user = AuthenticatedUser(id=user.id, login=user.login)
+
+    access_token_expires = timedelta(minutes=cfg.ACCESS_TOKEN_EXPIRE_MINUTES)
+    access_token = create_access_token(
+        data=authenticated_user.dict(), expires_delta=access_token_expires
+    )
+    return LoginResponse(
+        user_id=user.id,
+        access_token=access_token,
+    )
 
 
 @router.get("/private/test", response_model=str)
