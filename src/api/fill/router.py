@@ -63,10 +63,13 @@ async def fake_ideas():
 
         if f'{idx}.jpg' in os.listdir('src/api/fill/images'):
             photo = f'src/api/fill/images/{idx}.jpg'
+            logo = f'src/api/fill/images/{idx}.jpg'
         else:
             photo = f'src/api/fill/images/{idx}.png'
+            logo = f'src/api/fill/images/{idx}.jpg'
 
         shutil.copyfile(photo, f'src/files/{photos}.jpg')
+        shutil.copyfile(photo, f'src/files/{logo}.jpg')
 
         if video_id:
             shutil.copyfile(f'src/api/fill/videos/{idx}.mp4', f'src/files/{video_id}.mp4')
