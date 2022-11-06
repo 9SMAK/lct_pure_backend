@@ -123,7 +123,7 @@ async def request_membership(*,
 
 
 @router.get("/get_unwatched_idea", response_model=Idea)
-async def get_unwatched_ideas(*,
+async def get_unwatched_idea(*,
                               telegram_username: str) -> List[Idea]:
     user = await check_telegram(telegram_username=telegram_username)
     ideas = await IDEA.get_approved()

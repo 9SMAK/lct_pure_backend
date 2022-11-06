@@ -307,12 +307,12 @@ async def get_idea_by_id(id: int) -> IdeaResponse:
 @router.get("/get_unwatched_idea", response_model=List[IdeaResponse])
 async def get_unwatched_ideas(*,
                               current_user: AuthenticatedUser = Depends(get_current_user)) -> List[Idea]:
-    all_ideas = await IDEA.get_approved()
-    all_relations = await USERIDEARELATIONS.get_all_by_user_id(user_id=current_user.id)
-    all_relations_ids = [relation.idea_id for relation in all_relations]
-    result = [await convert_to_req_idea(idea) for idea in all_ideas if idea.id not in all_relations_ids]
+    ideas = await IDEA.get_approved()
+    relations = await USERIDEARELATIONS.get_all_by_user_id(user_id=current_user.id)
+    relations_ids = [relation.idea_id for relation in relations]
+    result = [idea for idea in ideas if idea.id not in relations_ids]
 
     if len(result) == 0:
-        raise HTTPException(detail="No ideas to show.", status_code=status.HTTP_404_NOT_FOUND)
+        raise HTTPException(detail="No ideas to show", status_code=status.HTTP_400_BAD_REQUEST)
 
-    return result
+    return result[0]
