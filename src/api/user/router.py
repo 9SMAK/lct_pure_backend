@@ -17,28 +17,31 @@ router = APIRouter(prefix="/user", tags=["User"])
 
 @router.post('/edit_profile', response_model=OkResponse)
 async def edit_profile(*, current_user: AuthenticatedUser = Depends(get_current_user),
-                       avatar: UploadFile = None,
-                       edit_info: EditProfileRequest = Body(...)) -> OkResponse:
-    user = await USER.get_by_id(current_user.id)
-
-    if avatar:
-        if user.avatar_id is None:
-            avatar_id = str(uuid.uuid4())
-            await USER.edit_profile(current_user.id, avatar_id=avatar_id)
-        else:
-            await remove_file(user.avatar_id)
-            avatar_id = user.avatar_id
-
-        await async_upload_file(file=avatar,
-                                file_id=avatar_id,
-                                ext='.jpg')
-
+                       edit_info: EditProfileRequest) -> OkResponse:
     result = await USER.edit_profile(current_user.id, **edit_info.dict(exclude_none=True))
     if not result:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Error while editing profile",
         )
+    return OkResponse()
+
+
+@router.post('/edit_avatar', response_model=OkResponse)
+async def edit_profile(*, current_user: AuthenticatedUser = Depends(get_current_user),
+                       avatar: UploadFile) -> OkResponse:
+    user = await USER.get_by_id(current_user.id)
+
+    if user.avatar_id is None:
+        avatar_id = str(uuid.uuid4())
+        await USER.edit_profile(current_user.id, avatar_id=avatar_id)
+    else:
+        await remove_file(user.avatar_id)
+        avatar_id = user.avatar_id
+
+    await async_upload_file(file=avatar,
+                            file_id=avatar_id,
+                            ext='.jpg')
     return OkResponse()
 
 

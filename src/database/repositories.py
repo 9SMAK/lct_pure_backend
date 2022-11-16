@@ -56,7 +56,7 @@ class Repository:
                 session.add(new_elem)
                 await session.commit()
                 await session.refresh(new_elem)
-                return True
+                return new_elem.id
             except IntegrityError:
                 await session.rollback()
                 return False
@@ -127,6 +127,12 @@ class IdeaRepository(Repository):
             self._table.id == idea_id
         ).values(likes_count=self._table.likes_count + 1)
         await self.update_values(statement)
+
+    async def get_idea_by_title(self, title: str):
+        async with self._sessionmaker() as session:
+            statement = select(self._table).filter(self._table.title == title)
+            res = (await session.execute(statement))
+            return self._pydantic_convert_object(res)
 
     async def safe_increase_comments(self, idea_id: int):
         statement = update(self._table).where(

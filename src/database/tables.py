@@ -36,8 +36,8 @@ class Idea(Base):
     description = Column(String)
     likes_count = Column(Integer)
     comments_count = Column(Integer)
-    logo_id = Column(String, nullable=False)
-    photo_ids = Column(ARRAY(String), nullable=False)
+    logo_id = Column(String)
+    photo_ids = Column(ARRAY(String))
     video_id = Column(String)
     approved = Column(Boolean)
 

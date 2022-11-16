@@ -16,8 +16,8 @@ class Idea(BaseModel):
     author_id: int
     likes_count: int
     comments_count: int
-    logo_id: str
-    photo_ids: List
+    logo_id: str = None
+    photo_ids: List = None
     video_id: str = None
     approved: bool = False
 
